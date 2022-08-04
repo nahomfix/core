@@ -21,13 +21,13 @@ interface MediaLanguage {
   name: string
 }
 
-interface Translation {
+export interface Translation {
   value: string
   languageId: string
   primary: boolean
 }
 
-interface Country {
+export interface Country {
   _key: string
   name: Translation[]
   population: number
@@ -36,6 +36,7 @@ interface Country {
   languageIds: string[]
   latitude: float
   longitude: float
+  aoa?: string
 }
 
 interface MediaCountry {
