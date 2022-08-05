@@ -5,11 +5,16 @@ import fetch from 'node-fetch'
 import slugify from 'slugify'
 import { ArangoDB } from './db'
 
-interface Language {
+export interface Language {
   _key: string
   name: Array<{ value: string; languageId: string; primary: boolean }>
   bcp47?: string
   iso3?: string
+  alternateLanguages?: Array<{
+    value: string
+    languageId: string
+    primary: boolean
+  }>
 }
 
 interface MediaLanguage {
