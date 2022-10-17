@@ -10,6 +10,7 @@ import Stack from '@mui/material/Stack'
 import { v4 as uuidv4 } from 'uuid'
 import { useMutation, gql } from '@apollo/client'
 import { DragDropContext, Droppable } from 'react-beautiful-dnd'
+import { getJourneyRTL } from '@core/journeys/ui/rtl'
 import { StepsOrderUpdate } from '../../../__generated__/StepsOrderUpdate'
 import { StepAndCardBlockCreate } from '../../../__generated__/StepAndCardBlockCreate'
 import { GetJourney_journey_blocks_StepBlock as StepBlock } from '../../../__generated__/GetJourney'
@@ -64,6 +65,8 @@ export function CardPreview({
   )
   const [stepsOrderUpdate] = useMutation<StepsOrderUpdate>(STEPS_ORDER_UPDATE)
   const { journey } = useJourney()
+
+  const rtl = getJourneyRTL(journey)
 
   const handleChange = (selectedId: string): void => {
     if (steps == null) return
@@ -169,7 +172,7 @@ export function CardPreview({
   )
 
   return (
-    <>
+    <Box dir={rtl ? 'rtl' : 'ltr'}>
       {steps != null ? (
         isDraggable === true ? (
           <DragDropContext
@@ -180,6 +183,7 @@ export function CardPreview({
               {(provided) => (
                 <Box ref={provided.innerRef} {...provided.droppableProps}>
                   <CardList
+                    rtl={rtl}
                     steps={steps}
                     selected={selected}
                     showAddButton={showAddButton}
@@ -195,6 +199,7 @@ export function CardPreview({
           </DragDropContext>
         ) : (
           <CardList
+            rtl={rtl}
             steps={steps}
             selected={selected}
             handleClick={handleClick}
@@ -251,6 +256,6 @@ export function CardPreview({
           </Box>
         </Stack>
       )}
-    </>
+    </Box>
   )
 }

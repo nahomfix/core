@@ -673,7 +673,8 @@ const Template: Story = ({ ...args }) => {
           journey: {
             id: 'journeyId',
             themeMode: ThemeMode.light,
-            themeName: ThemeName.base
+            themeName: ThemeName.base,
+            language: args.language
           } as unknown as Journey,
           admin: true
         }}
@@ -694,24 +695,60 @@ const Template: Story = ({ ...args }) => {
 
 export const Default = Template.bind({})
 Default.args = {
-  steps
+  steps,
+  language: {
+    __typename: 'Language',
+    id: '529',
+    bcp47: 'en',
+    iso3: 'eng',
+    name: [
+      {
+        __typename: 'Translation',
+        value: 'English',
+        primary: true
+      }
+    ]
+  }
 }
 
 export const Draggable = Template.bind({})
 Draggable.args = {
-  steps,
+  ...Default.args,
   isDraggable: true
 }
 
 export const AddButton = Template.bind({})
 AddButton.args = {
-  steps,
+  ...Default.args,
   showAddButton: true
 }
 
 export const Loading = Template.bind({})
 Loading.args = {
+  ...Default.args,
   steps: undefined
+}
+
+export const RTL = Template.bind({})
+RTL.args = {
+  ...Default.args,
+  language: {
+    __typename: 'Language',
+    id: '529',
+    bcp47: 'ar',
+    iso3: 'arb',
+    name: [
+      {
+        __typename: 'Translation',
+        value: 'Arabic',
+        primary: false
+      }
+    ]
+  },
+  isDraggable: true
+}
+RTL.parameters = {
+  rtl: true
 }
 
 export default CardPreviewStory as Meta

@@ -22,6 +22,7 @@ import { CardWrapper } from '../../Editor/Canvas/CardWrapper'
 import { BlockFields_StepBlock as StepBlock } from '../../../../__generated__/BlockFields'
 
 interface CardListProps {
+  rtl?: boolean
   steps: Array<TreeBlock<StepBlock>>
   selected?: TreeBlock<StepBlock>
   showAddButton?: boolean
@@ -33,6 +34,7 @@ interface CardListProps {
 }
 
 export function CardList({
+  rtl,
   steps,
   selected,
   showAddButton,
@@ -85,6 +87,7 @@ export function CardList({
                 key={step.id}
                 id={step.id}
                 provided={provided}
+                rtl={rtl}
                 step={step}
                 snapshot={snapshot}
                 isDraggable={isDraggable}
@@ -94,7 +97,7 @@ export function CardList({
         ))}
       {droppableProvided == null &&
         steps.map((step) => (
-          <CardItem key={step.id} id={step.id} step={step} />
+          <CardItem key={step.id} rtl={rtl} id={step.id} step={step} />
         ))}
       {droppableProvided != null ? droppableProvided.placeholder : null}
     </HorizontalSelect>
@@ -102,6 +105,7 @@ export function CardList({
 }
 
 interface CardItemProps {
+  rtl?: boolean
   step: TreeBlock<StepBlock>
   id: string
   provided?: DraggableProvided
@@ -110,6 +114,7 @@ interface CardItemProps {
 }
 
 const CardItem = ({
+  rtl = false,
   step,
   id,
   provided,
@@ -152,7 +157,7 @@ const CardItem = ({
       <Box
         sx={{
           transform: 'scale(0.25)',
-          transformOrigin: 'top left'
+          transformOrigin: rtl ? 'top right' : 'top left'
         }}
       >
         <Box

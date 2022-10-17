@@ -10,6 +10,7 @@ import { CacheProvider } from '@emotion/react'
 import type { EmotionCache } from '@emotion/cache'
 import { createEmotionCache } from '@core/shared/ui/createEmotionCache'
 import { FlagsProvider } from '@core/shared/ui/FlagsProvider'
+import { getJourneyRTL } from '@core/journeys/ui/rtl'
 import { appWithTranslation } from 'next-i18next'
 import { useTranslation } from 'react-i18next'
 import { useApollo } from '../src/libs/apolloClient'
@@ -19,12 +20,11 @@ import i18nConfig from '../next-i18next.config'
 
 // your _app component
 initAuth()
-const clientSideEmotionCache = createEmotionCache({})
 
 function JourneysAdminApp({
   Component,
   pageProps,
-  emotionCache = clientSideEmotionCache
+  emotionCache = createEmotionCache({ rtl: getJourneyRTL(pageProps.journey) })
 }: AppProps & { emotionCache?: EmotionCache }): ReactElement {
   const { t } = useTranslation('apps-journeys-admin')
   const token =
