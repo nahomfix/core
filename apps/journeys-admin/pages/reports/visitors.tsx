@@ -10,6 +10,7 @@ import { useRouter } from 'next/router'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useTranslation } from 'react-i18next'
 import { getLaunchDarklyClient } from '@core/shared/ui/getLaunchDarklyClient'
+import { VisitorList } from '../../src/components/VisitorList'
 import { PageWrapper } from '../../src/components/PageWrapper'
 import i18nConfig from '../../next-i18next.config'
 
@@ -26,7 +27,7 @@ function ReportsVisitorsPage(): ReactElement {
         authUser={AuthUser}
         router={router}
       >
-        Visitors report list
+        <VisitorList />
       </PageWrapper>
     </>
   )
