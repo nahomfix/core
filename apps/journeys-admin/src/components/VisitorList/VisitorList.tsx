@@ -1,5 +1,4 @@
-import { ReactElement, useEffect, useRef, useState } from 'react'
-import Box from '@mui/material/Box'
+import { ReactElement, useState } from 'react'
 import { DataGrid } from '@mui/x-data-grid'
 import { gql, useQuery } from '@apollo/client'
 import { GetVisitorsConnection } from '../../../__generated__/GetVisitorsConnection'
