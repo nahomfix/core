@@ -1,9 +1,7 @@
 import { ReactElement } from 'react'
 import { GetStaticPaths, GetStaticProps } from 'next'
-import { gql } from '@apollo/client'
 import { ThemeProvider } from '@core/shared/ui/ThemeProvider'
 import { transformer } from '@core/journeys/ui/transformer'
-import { JOURNEY_FIELDS } from '@core/journeys/ui/JourneyProvider/journeyFields'
 import { JourneyProvider } from '@core/journeys/ui/JourneyProvider'
 import { getJourneyRTL } from '@core/journeys/ui/rtl'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -11,15 +9,12 @@ import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import { Conductor } from '../src/components/Conductor'
 import { createApolloClient } from '../src/libs/apolloClient'
-import {
-  GetJourney,
-  GetJourney_journey as Journey
-} from '../__generated__/GetJourney'
-import { GetJourneySlugs } from '../__generated__/GetJourneySlugs'
 import i18nConfig from '../next-i18next.config'
+import { graphql } from '../__generated__'
+import { GetJourneyQuery } from '../__generated__/graphql'
 
 interface JourneyPageProps {
-  journey: Journey
+  journey: NonNullable<GetJourneyQuery['journey']>
 }
 
 function JourneyPage({ journey }: JourneyPageProps): ReactElement {
@@ -83,27 +78,26 @@ function JourneyPage({ journey }: JourneyPageProps): ReactElement {
   )
 }
 
-export const GET_JOURNEY = gql`
-  ${JOURNEY_FIELDS}
+export const GET_JOURNEY = graphql(`
   query GetJourney($id: ID!) {
     journey(id: $id, idType: slug) {
       ...JourneyFields
     }
   }
-`
+`)
 
 export const getStaticProps: GetStaticProps<JourneyPageProps> = async (
   context
 ) => {
   const apolloClient = createApolloClient()
-  const { data } = await apolloClient.query<GetJourney>({
+  const { data } = await apolloClient.query({
     query: GET_JOURNEY,
     variables: {
       id: context.params?.journeySlug
     }
   })
 
-  if (data.journey === null) {
+  if (data.journey == null) {
     return {
       props: {
         ...(await serverSideTranslations(
@@ -130,17 +124,17 @@ export const getStaticProps: GetStaticProps<JourneyPageProps> = async (
   }
 }
 
-export const GET_JOURNEY_SLUGS = gql`
+export const GET_JOURNEY_SLUGS = graphql(`
   query GetJourneySlugs {
     journeys {
       slug
     }
   }
-`
+`)
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const apolloClient = createApolloClient()
-  const { data } = await apolloClient.query<GetJourneySlugs>({
+  const { data } = await apolloClient.query({
     query: GET_JOURNEY_SLUGS
   })
 

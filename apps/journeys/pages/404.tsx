@@ -12,7 +12,7 @@ import {
   ButtonSize,
   ThemeName,
   ThemeMode
-} from '../__generated__/globalTypes'
+} from '../__generated__/graphql'
 
 const blocks: Block[] = [
   {

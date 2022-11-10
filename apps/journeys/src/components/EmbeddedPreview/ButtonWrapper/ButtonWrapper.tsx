@@ -5,7 +5,7 @@ import MuiButton from '@mui/material/Button'
 import Box from '@mui/material/Box'
 
 import { IconFields } from '../../../../__generated__/IconFields'
-import { ButtonVariant } from '../../../../__generated__/globalTypes'
+import { ButtonVariant } from '../../../../__generated__/graphql'
 import { GetJourney_journey_blocks_ButtonBlock as ButtonBlock } from '../../../../__generated__/GetJourney'
 
 export function ButtonWrapper({
@@ -15,11 +15,9 @@ export function ButtonWrapper({
 }): ReactElement {
   const startIcon = block.children.find(
     (child) => child.id === block.startIconId
-  ) as TreeBlock<IconFields> | undefined
+  )
 
-  const endIcon = block.children.find(
-    (child) => child.id === block.endIconId
-  ) as TreeBlock<IconFields> | undefined
+  const endIcon = block.children.find((child) => child.id === block.endIconId)
 
   return (
     // Margin added via Box so it's ignored by admin selection border outline

@@ -7,7 +7,7 @@ import {
   IconSize,
   TypographyVariant,
   VideoBlockSource
-} from '../../../__generated__/globalTypes'
+} from '../../../__generated__/graphql'
 
 export const basic: TreeBlock[] = [
   {

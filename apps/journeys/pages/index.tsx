@@ -5,18 +5,18 @@ import Container from '@mui/material/Container'
 import { ThemeProvider } from '@core/shared/ui/ThemeProvider'
 import Link from 'next/link'
 import { GetStaticProps } from 'next'
-import { gql } from '@apollo/client'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { createApolloClient } from '../src/libs/apolloClient'
+import { graphql } from '../__generated__'
 import {
-  GetJourneys,
-  GetJourneys_journeys as Journey
-} from '../__generated__/GetJourneys'
-import { ThemeMode, ThemeName } from '../__generated__/globalTypes'
+  GetJourneysQuery,
+  ThemeMode,
+  ThemeName
+} from '../__generated__/graphql'
 import i18nConfig from '../next-i18next.config'
 
 interface JourneysPageProps {
-  journeys: Journey[]
+  journeys: GetJourneysQuery['journeys']
 }
 
 function JourneysPage({ journeys }: JourneysPageProps): ReactElement {
@@ -41,8 +41,8 @@ export const getStaticProps: GetStaticProps<JourneysPageProps> = async (
   context
 ) => {
   const apolloClient = createApolloClient()
-  const { data } = await apolloClient.query<GetJourneys>({
-    query: gql`
+  const { data } = await apolloClient.query({
+    query: graphql(`
       query GetJourneys {
         journeys(where: { featured: true }) {
           id
@@ -50,7 +50,7 @@ export const getStaticProps: GetStaticProps<JourneysPageProps> = async (
           slug
         }
       }
-    `
+    `)
   })
 
   if (data.journeys === null) {

@@ -17,7 +17,7 @@ import {
   ThemeName,
   ThemeMode,
   JourneyStatus
-} from '../../../__generated__/globalTypes'
+} from '../../../__generated__/graphql'
 import { basic } from '../../libs/testData/storyData'
 import { JOURNEY_VIEW_EVENT_CREATE } from './Conductor'
 import { Conductor } from '.'

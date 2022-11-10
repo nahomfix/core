@@ -13,7 +13,7 @@ import {
   ThemeName,
   ThemeMode,
   JourneyStatus
-} from '../../../__generated__/globalTypes'
+} from '../../../__generated__/graphql'
 import {
   basic,
   imageBlocks,
