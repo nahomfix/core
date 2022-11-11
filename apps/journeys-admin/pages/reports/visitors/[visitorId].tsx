@@ -26,6 +26,7 @@ function SingleVisitorReportsPage(): ReactElement {
         title={t('Visitor Info')}
         authUser={AuthUser}
         router={router}
+        backHref="/reports/visitors"
       >
         <VisitorInfo id={router.query.visitorId as string} />
       </PageWrapper>
