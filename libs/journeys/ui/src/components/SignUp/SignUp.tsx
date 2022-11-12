@@ -76,12 +76,10 @@ export const SignUp = ({
   const initialValues: SignUpFormValues = { name: '', email: '' }
   const signUpSchema = object().shape({
     name: string()
-      .min(2, t('Name must be 2 characters or more'))
-      .max(50, t('Name must be 50 characters or less'))
-      .required(t('Required')),
-    email: string()
-      .email(t('Please enter a valid email address'))
-      .required(t('Required'))
+      .min(2, t('minCharacters', { min: 2 }))
+      .max(50, t('maxCharacters', { max: 50 }))
+      .required(t('required')),
+    email: string().email(t('invalidEmail')).required(t('required'))
   })
 
   const onSubmitHandler = async (values: SignUpFormValues): Promise<void> => {

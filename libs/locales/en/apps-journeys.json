@@ -1,7 +1,6 @@
 {
-  "%s | Next Steps": "%s | Next Steps",
-  "Next Steps | Helping you find the next best step on your spiritual journey": "Next Steps | Helping you find the next best step on your spiritual journey",
-  "NextSteps © {{year}}": "NextSteps © {{year}}",
-  "Terms": "Terms",
-  "Privacy": "Privacy"
+  "app": {
+    "seoTemplate": "%s | Next Steps",
+    "seoDefaultTitle": "Next Steps | Helping you find the next best step on your spiritual journey"
+  }
 }

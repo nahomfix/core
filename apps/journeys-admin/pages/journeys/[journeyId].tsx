@@ -64,13 +64,13 @@ function JourneyIdPage(): ReactElement {
       {error?.graphQLErrors[0].message ===
         'User has not received an invitation to edit this journey.' && (
         <>
-          <NextSeo title={t('Access Denied')} />
+          <NextSeo title={t('accessDenied')} />
           <JourneyInvite journeyId={router.query.journeyId as string} />
         </>
       )}
       {error?.graphQLErrors[0].message === 'User invitation pending.' && (
         <>
-          <NextSeo title={t('Access Denied')} />
+          <NextSeo title={t('accessDenied')} />
           <JourneyInvite
             journeyId={router.query.journeyId as string}
             requestReceived

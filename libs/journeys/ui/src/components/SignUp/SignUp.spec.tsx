@@ -1,4 +1,8 @@
-import { ReactElement } from 'react'
+import { resolve } from 'path'
+import { ReactElement, Suspense } from 'react'
+import { appWithTranslation } from 'next-i18next'
+import { NextRouter } from 'next/router'
+
 import { render, fireEvent, waitFor } from '@testing-library/react'
 import { MockedProvider, MockedResponse } from '@apollo/client/testing'
 import { SnackbarProvider } from 'notistack'
@@ -9,6 +13,8 @@ import { activeBlockVar, treeBlocksVar } from '../../libs/block'
 import { JourneyProvider } from '../../libs/JourneyProvider'
 import { handleAction } from '../../libs/action'
 import { BlockFields_StepBlock as StepBlock } from '../../libs/block/__generated__/BlockFields'
+// import I18nProvider from '../../../test/I18nProvider'
+import i18nConfig from '../../../next-i18next.config'
 import { SignUp, SIGN_UP_SUBMISSION_EVENT_CREATE } from './SignUp'
 import { SignUpFields } from './__generated__/SignUpFields'
 
@@ -80,16 +86,45 @@ interface SignUpMockProps {
 }
 
 const SignUpMock = ({ mocks = [] }: SignUpMockProps): ReactElement => (
-  <MockedProvider mocks={mocks} addTypename={false}>
-    <SignUp {...block} uuid={() => 'uuid'} />
-  </MockedProvider>
+  <Suspense fallback="loading">
+    <MockedProvider mocks={mocks} addTypename={false}>
+      <SignUp {...block} uuid={() => 'uuid'} />
+    </MockedProvider>
+  </Suspense>
 )
+
+const TranslatedMock = appWithTranslation(() => <SignUpMock />, i18nConfig)
+
+const createProps = (locale = 'en', router: Partial<NextRouter> = {}): any =>
+  ({
+    pageProps: {
+      _nextI18Next: {
+        initialLocale: locale,
+        userConfig: {
+          i18n: {
+            defaultLocale: 'en',
+            locales: ['en'],
+            localePath: resolve('./locales')
+          }
+        }
+      }
+    } as any,
+    router: {
+      locale: locale,
+      route: '/',
+      ...router
+    }
+  } as any)
 
 describe('SignUp', () => {
   it('should validate when fields are empty', async () => {
+    // jest.mock('react-i18next', () => ({
+    //   useTranslation: () => ({ t: (key) => key })
+    // }))
     const { getByRole, getAllByText } = render(
       <SnackbarProvider>
-        <SignUpMock />
+        {/* <SignUpMock /> */}
+        <TranslatedMock {...createProps()} />
       </SnackbarProvider>
     )
 
