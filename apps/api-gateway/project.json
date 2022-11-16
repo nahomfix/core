@@ -73,7 +73,7 @@
       "options": {
         "commands": [
           {
-            "command": "rover supergraph compose --config apps/api-gateway/supergraph.yml > apps/api-gateway/schema.graphql"
+            "command": "APOLLO_ELV2_LICENSE=accept rover supergraph compose --config apps/api-gateway/supergraph.yml > apps/api-gateway/schema.graphql"
           }
         ]
       }

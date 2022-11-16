@@ -1,13 +1,9 @@
-import { Logger } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app/app.module'
 
 async function bootstrap(): Promise<void> {
-  const port = process.env.PORT ?? '4001'
-  const app = await NestFactory.create(AppModule)
-  await app.listen(port, () => {
-    Logger.log('Listening at http://localhost:' + port + '/graphql')
-  })
+  const app = await NestFactory.create(AppModule, { logger: false })
+  await app.listen(process.env.PORT ?? '4001')
 }
 
 bootstrap().catch((err) => console.log(err))

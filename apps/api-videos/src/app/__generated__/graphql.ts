@@ -7,6 +7,7 @@
 
 /* tslint:disable */
 /* eslint-disable */
+
 export enum IdType {
     databaseId = "databaseId",
     slug = "slug"
@@ -34,6 +35,20 @@ export class VideoTag {
     __typename?: 'VideoTag';
     id: string;
     title: Translation[];
+}
+
+export abstract class IQuery {
+    __typename?: 'IQuery';
+
+    abstract videoTags(): Nullable<VideoTag[]> | Promise<Nullable<VideoTag[]>>;
+
+    abstract videoTag(id: string): Nullable<VideoTag> | Promise<Nullable<VideoTag>>;
+
+    abstract episodes(playlistId: string, idType?: Nullable<IdType>, where?: Nullable<VideosFilter>, offset?: Nullable<number>, limit?: Nullable<number>): Video[] | Promise<Video[]>;
+
+    abstract videos(where?: Nullable<VideosFilter>, offset?: Nullable<number>, limit?: Nullable<number>): Video[] | Promise<Video[]>;
+
+    abstract video(id: string, idType?: Nullable<IdType>): Video | Promise<Video>;
 }
 
 export class Translation {
@@ -78,18 +93,6 @@ export class VideoVariant {
     duration: number;
     language: Language;
     subtitle: Translation[];
-}
-
-export abstract class IQuery {
-    abstract videoTags(): Nullable<VideoTag[]> | Promise<Nullable<VideoTag[]>>;
-
-    abstract videoTag(id: string): Nullable<VideoTag> | Promise<Nullable<VideoTag>>;
-
-    abstract episodes(playlistId: string, idType?: Nullable<IdType>, where?: Nullable<VideosFilter>, offset?: Nullable<number>, limit?: Nullable<number>): Video[] | Promise<Video[]>;
-
-    abstract videos(where?: Nullable<VideosFilter>, offset?: Nullable<number>, limit?: Nullable<number>): Video[] | Promise<Video[]>;
-
-    abstract video(id: string, idType?: Nullable<IdType>): Video | Promise<Video>;
 }
 
 export class Language {
