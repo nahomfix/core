@@ -1,5 +1,5 @@
 import { InMemoryCache } from '@apollo/client'
-import { offsetLimitPagination } from '@apollo/client/utilities'
+import { offsetLimitPagination, relayStylePagination } from '@apollo/client/utilities'
 
 export const cache = (): InMemoryCache =>
   new InMemoryCache({
@@ -36,7 +36,8 @@ export const cache = (): InMemoryCache =>
     typePolicies: {
       Query: {
         fields: {
-          videos: offsetLimitPagination(['where'])
+          videos: offsetLimitPagination(['where']),
+          visitorsConnection: relayStylePagination()
         }
       }
     }

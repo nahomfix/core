@@ -1,6 +1,7 @@
 import { ReactElement, useState } from 'react'
 import { DataGrid } from '@mui/x-data-grid'
 import { gql, useQuery } from '@apollo/client'
+import { Box } from '@mui/material'
 import { GetVisitorsConnection } from '../../../__generated__/GetVisitorsConnection'
 
 export const GET_VISITORS_CONNECTION = gql`
@@ -24,7 +25,7 @@ export const GET_VISITORS_CONNECTION = gql`
   }
 `
 
-const PAGE_SIZE = 100
+const PAGE_SIZE = 1
 
 export function VisitorList(): ReactElement {
   const [page, setPage] = useState(0)
@@ -32,7 +33,7 @@ export function VisitorList(): ReactElement {
     GET_VISITORS_CONNECTION,
     {
       variables: {
-        first: 100,
+        first: 1,
         // this should be removed when the UI can support team management
         teamId: 'jfp-team'
       }
@@ -48,7 +49,7 @@ export function VisitorList(): ReactElement {
   }
 
   return (
-    <>
+    <Box sx={{ height: 'calc(100vh - 48px)' }}>
       <DataGrid
         rows={data?.visitorsConnection?.edges?.map(({ node }) => node) ?? []}
         columns={[
@@ -59,13 +60,15 @@ export function VisitorList(): ReactElement {
           { field: 'createdAt', headerName: 'Time Started' }
         ]}
         pagination
+        hideFooterSelectedRowCount
+        rowCount={2}
         pageSize={PAGE_SIZE}
-        rowsPerPageOptions={[PAGE_SIZE]}
+        rowsPerPageOptions={[1,5,10]}
         paginationMode="server"
         onPageChange={handlePageChange}
         page={page}
         loading={loading}
       />
-    </>
+    </Box>
   )
 }
