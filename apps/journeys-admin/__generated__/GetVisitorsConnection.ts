@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { VisitorStatus } from "./globalTypes";
+
 // ====================================================
 // GraphQL query operation: GetVisitorsConnection
 // ====================================================
@@ -10,6 +12,10 @@
 export interface GetVisitorsConnection_visitorsConnection_edges_node {
   __typename: "Visitor";
   id: string;
+  /**
+   * Status of the visitor as populated by VisitorUpdate mutation.
+   */
+  status: VisitorStatus | null;
   /**
    * The name of the visitor as populated by VisitorUpdate mutation or
    * SignUpEventSubmissionEventCreate mutation.
