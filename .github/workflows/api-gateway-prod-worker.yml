@@ -12,6 +12,12 @@ on:
       branch:
         required: true
         type: string
+      ecs_cluster:
+        required: true
+        type: string
+      ecs_service:
+        required: true
+        type: string
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -20,6 +26,12 @@ on:
       AWS_DEFAULT_REGION:
         required: true
       KUBE_CONFIG_DATA:
+        required: true
+      CA_CRT:
+        required: true
+      USER_CRT:
+        required: true
+      USER_KEY:
         required: true
 
 jobs:
@@ -41,6 +53,22 @@ jobs:
         with:
           node-version: '16'
           cache: 'npm'
+
+      - name: Install Open VPN
+        run: sudo apt-get install openvpn
+
+      - name: Connect VPN
+        uses: golfzaptw/action-connect-ovpn@master
+        id: connect_vpn
+        with:
+          FILE_OVPN: '.github/vpn/config.ovpn'
+        env:
+          CA_CRT: ${{ secrets.CA_CRT}}
+          USER_CRT: ${{ secrets.USER_CRT }}
+          USER_KEY: ${{ secrets.USER_KEY }}
+
+      - name: Check Connect VPN
+        run: echo ${{ steps.connect_vpn.outputs.STATUS }}
 
       - name: Cache Node Modules
         id: cache-node-modules
@@ -117,3 +145,61 @@ jobs:
           KUBECTL_VERSION: 'v1.21.12'
         with:
           args: rollout status deploy ${{ inputs.name }}-$ENV_SUFFIX
+
+      # TODO: Used once we have moved to ECS
+      # - name: Build api-journeys-main schema
+      #   run: rover subgraph introspect http://api-journeys.service.internal:4001/graphql > dist/apps/api-gateway/api-journeys-schema.graphql
+
+      # - name: Build api-users-main schema
+      #   run: rover subgraph introspect http://api-users.service.internal:4002/graphql > dist/apps/api-gateway/api-users-schema.graphql
+
+      # - name: Build api-languages-main schema
+      #   run: rover subgraph introspect http://api-languages.service.internal:4003/graphql > dist/apps/api-gateway/api-languages-schema.graphql
+
+      # - name: Build api-videos-main schema
+      #   run: rover subgraph introspect https://api-videos.service.internal:4004/graphql > dist/apps/api-gateway/api-videos-schema.graphql
+
+      - name: Build api-gateway schema
+        run: rover supergraph compose --config apps/api-gateway/supergraph-$ENV_SUFFIX-ecs.yml > dist/apps/api-gateway/schema.graphql
+
+      - name: Configure ECS AWS credentials
+        if: contains(steps.affected-apps.outputs.apps, inputs.name)
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.JFP_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.JFP_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Login to Amazon ECR
+        if: contains(steps.affected-apps.outputs.apps, inputs.name)
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push the image to Amazon ECR
+        if: contains(steps.affected-apps.outputs.apps, inputs.name)
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          # Build a docker container and push it to ECR 
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest . -f apps/${{ inputs.name }}/Dockerfile
+          echo "Pushing image to ECR..."
+          docker push -a $ECR_REGISTRY/$ECR_REPOSITORY
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition --task-definition ${{ inputs.repository }} --query taskDefinition > task-definition.json
+
+      - name: Redeploy ECS service
+        if: contains(steps.affected-apps.outputs.apps, inputs.name)
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          service: ${{ inputs.ecs_service }}
+          cluster: ${{ inputs.ecs_cluster }}
+          wait-for-service-stability: true
+
+      - name: kill vpn
+        if: always()
+        run: sudo killall openvpn
