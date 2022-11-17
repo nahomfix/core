@@ -94,6 +94,7 @@
     "react-gtm-module": "^2.0.11",
     "react-helmet": "^6.1.0",
     "react-i18next": "^11.16.9",
+    "react-intersection-observer": "^9.4.1",
     "react-leaflet": "^3.2.5",
     "react-multi-carousel": "^2.8.0",
     "react-router-dom": "5.3.0",

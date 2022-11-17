@@ -1,4 +1,5 @@
-import { ReactElement, useRef, useCallback, useState, useEffect } from 'react'
+import { InView } from 'react-intersection-observer'
+import { ReactElement } from 'react'
 import { gql, useQuery } from '@apollo/client'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -30,7 +31,7 @@ export const GET_VISITORS_CONNECTION = gql`
   }
 `
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 5
 
 export interface Column {
   id: string
@@ -41,47 +42,28 @@ export interface Column {
 
 export function VisitorList(): ReactElement {
   const { loading, data, fetchMore } = useQuery<GetVisitorsConnection>(
-    GET_VISITORS_CONNECTION, {
-    variables: {
-      first: PAGE_SIZE,
-      // this should be removed when the UI can support team management
-      teamId: 'jfp-team'
+    GET_VISITORS_CONNECTION,
+    {
+      variables: {
+        first: PAGE_SIZE,
+        // this should be removed when the UI can support team management
+        teamId: 'jfp-team'
+      }
     }
-  })
+  )
 
-  const tableEl = useRef<HTMLTableColElement>(null)
-
-  const scrollListener = () => {
-    if (tableEl.current != null) {
-      const bottom = tableEl.current.scrollHeight - tableEl.current.scrollTop < tableEl.current.clientHeight + 100
-      if (bottom && data?.visitorsConnection?.pageInfo?.hasNextPage === true && !loading) {
-        console.log("Loading More")
-        void fetchMore({
-          variables: {
-            after: data?.visitorsConnection?.pageInfo?.endCursor
-          }
-        })
-      }
-    }       
+  const handleInView = async (inView: boolean): Promise<void> => {
+    if (
+      inView &&
+      !loading &&
+      data?.visitorsConnection?.pageInfo?.hasNextPage === true
+    )
+      await fetchMore({
+        variables: {
+          after: data?.visitorsConnection?.pageInfo?.endCursor
+        }
+      })
   }
-
-  useEffect(() => {
-    const tableRef = tableEl.current
-    if (tableRef != null) {
-      tableRef.addEventListener('scroll', scrollListener)
-      return () => {
-        tableRef.removeEventListener('scroll', scrollListener)
-      }
-    }    
-  }, [scrollListener])
-
-  // const handlePageChange = async (): Promise<void> => {
-  //   await fetchMore({
-  //     variables: {
-  //       after: data?.visitorsConnection?.pageInfo?.endCursor
-  //     }
-  //   })
-  // }
 
   const columns: Column[] = [
     {
@@ -104,8 +86,8 @@ export function VisitorList(): ReactElement {
   ]
 
   return (
-    <TableContainer sx={{ height: "100%" }} ref={tableEl}>
-      <Table stickyHeader aria-label="sticky table" >
+    <TableContainer sx={{ height: '100%' }}>
+      <Table stickyHeader aria-label="sticky table">
         <TableHead>
           <TableRow>
             {columns.map((column) => (
@@ -125,6 +107,7 @@ export function VisitorList(): ReactElement {
           ))}
         </TableBody>
       </Table>
+      <InView onChange={handleInView} />
     </TableContainer>
   )
 }
