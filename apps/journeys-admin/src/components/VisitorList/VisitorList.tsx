@@ -86,7 +86,9 @@ export function VisitorList(): ReactElement {
   ]
 
   return (
-    <TableContainer sx={{ height: '100%' }}>
+    <TableContainer
+      sx={{ height: '100%', backgroundColor: 'background.paper' }}
+    >
       <Table stickyHeader aria-label="sticky table">
         <TableHead>
           <TableRow>
@@ -94,7 +96,10 @@ export function VisitorList(): ReactElement {
               <TableCell
                 key={column.id}
                 align={column.align}
-                style={{ minWidth: column.minWidth }}
+                sx={{
+                  minWidth: column.minWidth,
+                  backgroundColor: 'background.paper'
+                }}
               >
                 {column.headerName ?? column.id}
               </TableCell>
