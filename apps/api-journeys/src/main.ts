@@ -3,7 +3,9 @@ import { AppModule } from './app/app.module'
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, { logger: false })
-  await app.listen(process.env.PORT ?? '4001')
+  const port = process.env.PORT ?? '4001'
+  await app.listen(port)
+  console.log(`🚀 Server listening on port`, port)
 }
 
-bootstrap().catch((err) => console.log(err))
+void bootstrap()

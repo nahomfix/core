@@ -4,6 +4,7 @@ import {
   ApolloFederationDriver,
   ApolloFederationDriverConfig
 } from '@nestjs/apollo'
+import { ApolloServerPluginInlineTraceDisabled } from 'apollo-server-core'
 import { GraphQLModule } from '@nestjs/graphql'
 import { VideoModule } from './modules/video/video.module'
 import { VideoVariantModule } from './modules/videoVariant/videoVariant.module'
@@ -17,6 +18,10 @@ import { VideoTagModule } from './modules/tag/tag.module'
     VideoTagModule,
     VideoVariantModule,
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
+      plugins:
+        process.env.NODE_ENV === 'production'
+          ? undefined
+          : [ApolloServerPluginInlineTraceDisabled()],
       driver: ApolloFederationDriver,
       typePaths: [
         join(process.cwd(), 'apps/api-videos/src/app/**/*.graphql'),

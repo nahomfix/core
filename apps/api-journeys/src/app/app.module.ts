@@ -5,6 +5,7 @@ import {
   ApolloFederationDriver,
   ApolloFederationDriverConfig
 } from '@nestjs/apollo'
+import { ApolloServerPluginInlineTraceDisabled } from 'apollo-server-core'
 import { ActionModule } from './modules/action/action.module'
 import { BlockModule } from './modules/block/block.module'
 import { JourneyModule } from './modules/journey/journey.module'
@@ -27,6 +28,10 @@ import { TeamModule } from './modules/team/team.module'
     UserRoleModule,
     VisitorModule,
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
+      plugins:
+        process.env.NODE_ENV === 'production'
+          ? undefined
+          : [ApolloServerPluginInlineTraceDisabled()],
       driver: ApolloFederationDriver,
       typePaths: [
         join(process.cwd(), 'apps/api-journeys/src/app/**/*.graphql'),

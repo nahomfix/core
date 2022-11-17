@@ -5,6 +5,7 @@ import {
   ApolloFederationDriver,
   ApolloFederationDriverConfig
 } from '@nestjs/apollo'
+import { ApolloServerPluginInlineTraceDisabled } from 'apollo-server-core'
 import { LanguageModule } from './modules/language/language.module'
 import { TranslationModule } from './modules/translation/translation.module'
 import { CountryModule } from './modules/country/country.module'
@@ -15,6 +16,10 @@ import { CountryModule } from './modules/country/country.module'
     LanguageModule,
     TranslationModule,
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
+      plugins:
+        process.env.NODE_ENV === 'production'
+          ? undefined
+          : [ApolloServerPluginInlineTraceDisabled()],
       driver: ApolloFederationDriver,
       typePaths: [
         join(process.cwd(), 'apps/api-languages/src/app/**/*.graphql'),

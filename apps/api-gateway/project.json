@@ -29,30 +29,14 @@
     "serve": {
       "executor": "@nrwl/node:execute",
       "options": {
+        "inspect": false,
         "buildTarget": "api-gateway:build"
       }
     },
     "serve-all": {
       "executor": "@nrwl/workspace:run-commands",
       "options": {
-        "commands": [
-          {
-            "command": "nx serve api-journeys"
-          },
-          {
-            "command": "nx serve api-users"
-          },
-          {
-            "command": "nx serve api-languages"
-          },
-          {
-            "command": "nx serve api-videos"
-          },
-          {
-            "command": "nx serve api-gateway"
-          }
-        ],
-        "parallel": true
+        "command": "npx foreman start --procfile apps/api-gateway/Procfile"
       }
     },
     "lint": {

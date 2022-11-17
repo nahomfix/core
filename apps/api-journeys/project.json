@@ -18,6 +18,7 @@
             "output": "./assets"
           }
         ],
+        "inspect": false,
         "generatePackageJson": true
       },
       "configurations": {
@@ -40,24 +41,17 @@
         "command": "npx ts-node apps/api-journeys/db/seed.ts"
       }
     },
-    "serve-nowatch": {
+    "serve": {
       "executor": "@nrwl/node:execute",
       "options": {
+        "inspect": false,
         "buildTarget": "api-journeys:build"
       }
     },
-    "serve": {
+    "generate-typings": {
       "executor": "@nrwl/workspace:run-commands",
       "options": {
-        "commands": [
-          {
-            "command": "nx serve-nowatch api-journeys"
-          },
-          {
-            "command": "npx ts-node apps/api-journeys/src/generate-typings.ts"
-          }
-        ],
-        "parallel": true
+        "command": "npx ts-node apps/api-journeys/src/generate-typings.ts"
       }
     },
     "lint": {

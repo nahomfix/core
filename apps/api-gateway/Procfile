@@ -1,0 +1,9 @@
+gateway: nx serve api-gateway
+journeys: PORT=4001 nx serve api-journeys
+journeys-types: nx generate-typings api-journeys
+users: PORT=4002 nx serve api-users
+users-types: nx generate-typings api-users
+languages: PORT=4003 nx serve api-languages
+languages-types: nx generate-typings api-languages
+videos: PORT=4004 nx serve api-videos
+videos-types: nx generate-typings api-videos
