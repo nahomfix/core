@@ -31,7 +31,7 @@ export const GET_VISITORS_CONNECTION = gql`
   }
 `
 
-const PAGE_SIZE = 5
+const PAGE_SIZE = 10
 
 export interface Column {
   id: string
@@ -88,6 +88,7 @@ export function VisitorList(): ReactElement {
   return (
     <TableContainer
       sx={{ height: '100%', backgroundColor: 'background.paper' }}
+      data-testid="The container"
     >
       <Table stickyHeader aria-label="sticky table">
         <TableHead>

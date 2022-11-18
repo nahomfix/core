@@ -1,18 +1,12 @@
-import { Story, Meta } from '@storybook/react'
 import { MockedProvider } from '@apollo/client/testing'
-// import { gql } from '@apollo/client'
-import { journeysAdminConfig } from '../../libs/storybook'
-// import { edges, pageInfo } from './VisitorListData'
+import { render, waitFor } from '@testing-library/react'
+import {
+    setupIntersectionMocking,
+    resetIntersectionMocking,
+  } from 'react-intersection-observer/test-utils';
 import { GET_VISITORS_CONNECTION, VisitorList } from './VisitorList'
 
-const VisitorListStory = {
-  ...journeysAdminConfig,
-  component: VisitorList,
-  title: 'Journeys-Admin/VisitorList'
-}
-
-const Template: Story = () => {
-  const reportMocks = [
+const reportMocks = [
     {
       request: {
         query: GET_VISITORS_CONNECTION,
@@ -104,16 +98,81 @@ const Template: Story = () => {
         }
       }
     }
-  ]  
-    return (
+]  
+
+beforeEach(() => {
+    setupIntersectionMocking(jest.fn);
+});
+  
+afterEach(() => {
+    resetIntersectionMocking();
+});
+
+describe('VisitorList', () => {
+  it('should render the report', async () => {
+    const { getByTestId } = render(
       <MockedProvider mocks={reportMocks}>
         <VisitorList />
-      </MockedProvider>
+      </MockedProvider>  
     )
-  
-}
-
-
-export const Default = Template.bind({})
-
-export default VisitorListStory as Meta
+    await waitFor(() =>
+      expect(getByTestId("The container")).toBeInTheDocument()
+    )
+  })
+  it('should render the correct row header', async () => {
+    const { getByText } = render(
+      <MockedProvider mocks={reportMocks}>
+        <VisitorList />
+      </MockedProvider>  
+    )
+    await waitFor(() =>
+      expect(getByText('Name')).toBeInTheDocument()
+    )
+    await waitFor(() =>
+      expect(getByText('Status')).toBeInTheDocument()
+    )
+    await waitFor(() =>
+      expect(getByText('ID')).toBeInTheDocument()
+    )
+    await waitFor(() =>
+      expect(getByText('Chat started')).toBeInTheDocument()
+    )
+    await waitFor(() =>
+      expect(getByText('Time started')).toBeInTheDocument()
+    )
+  })
+  it('should render the correct row data', async () => {
+    const { getByText } = render(
+      <MockedProvider mocks={reportMocks}>
+        <VisitorList />
+      </MockedProvider>  
+    )
+    await waitFor(() =>
+      expect(getByText('3f40a48a-4146-4394-91a8-4588ded7198b')).toBeInTheDocument()
+    )
+    await waitFor(() =>
+      expect(getByText('Testing 1')).toBeInTheDocument()
+    )
+    await waitFor(() =>
+      expect(getByText('Testing 2')).toBeInTheDocument()
+    )
+    await waitFor(() =>
+      expect(getByText('Testing 3')).toBeInTheDocument()
+    )
+    await waitFor(() =>
+      expect(getByText('Testing 4')).toBeInTheDocument()
+    )
+    await waitFor(() =>
+      expect(getByText('Testing 5')).toBeInTheDocument()
+    )
+    await waitFor(() =>
+      expect(getByText('Testing 6')).toBeInTheDocument()
+    )
+    await waitFor(() =>
+      expect(getByText('Testing 7')).toBeInTheDocument()
+    )
+    await waitFor(() =>
+      expect(getByText('Testing 8')).toBeInTheDocument()
+    )
+  })
+})
