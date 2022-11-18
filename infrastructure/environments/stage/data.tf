@@ -14,15 +14,18 @@ data "aws_ssm_parameter" "doppler_api_gateway_stage_token" {
   name = "/terraform/prd/DOPPLER_API_GATEWAY_STAGE_TOKEN"
 }
 
-data "aws_ssm_parameter" "doppler_api_languages_stage_token" {
-  name = "/terraform/prd/DOPPLER_API_LANGUAGES_STAGE_TOKEN"
-}
 data "aws_ssm_parameter" "doppler_api_journeys_stage_token" {
   name = "/terraform/prd/DOPPLER_API_JOURNEYS_STAGE_TOKEN"
 }
+
+data "aws_ssm_parameter" "doppler_api_languages_stage_token" {
+  name = "/terraform/prd/DOPPLER_API_LANGUAGES_STAGE_TOKEN"
+}
+
 data "aws_ssm_parameter" "doppler_api_users_stage_token" {
   name = "/terraform/prd/DOPPLER_API_USERS_STAGE_TOKEN"
 }
+
 data "aws_ssm_parameter" "doppler_api_videos_stage_token" {
   name = "/terraform/prd/DOPPLER_API_VIDEOS_STAGE_TOKEN"
 }
