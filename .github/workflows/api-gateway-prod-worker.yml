@@ -148,16 +148,16 @@ jobs:
 
       # TODO: Used once we have moved to ECS
       # - name: Build api-journeys-main schema
-      #   run: rover subgraph introspect http://api-journeys.service.internal:4001/graphql > dist/apps/api-gateway/api-journeys-schema.graphql
+      #   run: rover subgraph introspect http://api-journeys.service.internal/graphql > dist/apps/api-gateway/api-journeys-schema.graphql
 
       # - name: Build api-users-main schema
-      #   run: rover subgraph introspect http://api-users.service.internal:4002/graphql > dist/apps/api-gateway/api-users-schema.graphql
+      #   run: rover subgraph introspect http://api-users.service.internal/graphql > dist/apps/api-gateway/api-users-schema.graphql
 
       # - name: Build api-languages-main schema
-      #   run: rover subgraph introspect http://api-languages.service.internal:4003/graphql > dist/apps/api-gateway/api-languages-schema.graphql
+      #   run: rover subgraph introspect http://api-languages.service.internal/graphql > dist/apps/api-gateway/api-languages-schema.graphql
 
       # - name: Build api-videos-main schema
-      #   run: rover subgraph introspect https://api-videos.service.internal:4004/graphql > dist/apps/api-gateway/api-videos-schema.graphql
+      #   run: rover subgraph introspect https://api-videos.service.internal/graphql > dist/apps/api-gateway/api-videos-schema.graphql
 
       - name: Build api-gateway schema
         run: rover supergraph compose --config apps/api-gateway/supergraph-$ENV_SUFFIX-ecs.yml > dist/apps/api-gateway/schema.graphql
