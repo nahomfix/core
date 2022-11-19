@@ -42,7 +42,7 @@ locals {
   }
 }
 
-module "api-gateway" {
+module "api-gateway-stage" {
   source        = "../../../apps/api-gateway/infrastructure"
   ecs_config    = local.public_ecs_config
   env           = "stage"
