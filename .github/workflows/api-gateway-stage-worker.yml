@@ -33,6 +33,10 @@ on:
         required: true
       USER_KEY:
         required: true
+      JFP_AWS_ACCESS_KEY_ID:
+        required: true
+      JFP_AWS_SECRET_ACCESS_KEY:
+        required: true
 
 jobs:
   build-and-deploy:
@@ -53,22 +57,6 @@ jobs:
         with:
           node-version: '16'
           cache: 'npm'
-
-      - name: Install Open VPN
-        run: sudo apt-get install openvpn
-
-      - name: Connect VPN
-        uses: golfzaptw/action-connect-ovpn@master
-        id: connect_vpn
-        with:
-          FILE_OVPN: '.github/vpn/config.ovpn'
-        env:
-          CA_CRT: ${{ secrets.CA_CRT}}
-          USER_CRT: ${{ secrets.USER_CRT }}
-          USER_KEY: ${{ secrets.USER_KEY }}
-
-      - name: Check Connect VPN
-        run: echo ${{ steps.connect_vpn.outputs.STATUS }}
 
       - name: Cache Node Modules
         id: cache-node-modules
@@ -145,6 +133,22 @@ jobs:
           KUBECTL_VERSION: 'v1.21.12'
         with:
           args: rollout status deploy ${{ inputs.name }}-$ENV_SUFFIX
+
+      - name: Install Open VPN
+        run: sudo apt-get install openvpn
+
+      - name: Connect VPN
+        uses: golfzaptw/action-connect-ovpn@master
+        id: connect_vpn
+        with:
+          FILE_OVPN: '.github/vpn/${{ inputs.branch }}.ovpn'
+        env:
+          CA_CRT: ${{ secrets.CA_CRT}}
+          USER_CRT: ${{ secrets.USER_CRT }}
+          USER_KEY: ${{ secrets.USER_KEY }}
+
+      - name: Check Connect VPN
+        run: echo ${{ steps.connect_vpn.outputs.STATUS }}
 
       # TODO: Used once we have moved to ECS
       # - name: Build api-journeys-main schema

@@ -41,7 +41,10 @@ on:
         required: true
       USER_KEY:
         required: true
-
+      JFP_AWS_ACCESS_KEY_ID:
+        required: true
+      JFP_AWS_SECRET_ACCESS_KEY:
+        required: true
 jobs:
   build-and-deploy:
     environment: Production
@@ -59,22 +62,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 2
-
-      - name: Install Open VPN
-        run: sudo apt-get install openvpn
-
-      - name: Connect VPN
-        uses: golfzaptw/action-connect-ovpn@master
-        id: connect_vpn
-        with:
-          FILE_OVPN: '.github/vpn/${{ inputs.branch }}.ovpn'
-        env:
-          CA_CRT: ${{ secrets.CA_CRT}}
-          USER_CRT: ${{ secrets.USER_CRT }}
-          USER_KEY: ${{ secrets.USER_KEY }}
-
-      - name: Check Connect VPN
-        run: echo ${{ steps.connect_vpn.outputs.STATUS }}
 
       - uses: actions/setup-node@v2
         with:
@@ -161,6 +148,22 @@ jobs:
         with:
           targets: seed
           projects: ${{ inputs.name }}
+
+      - name: Install Open VPN
+        run: sudo apt-get install openvpn
+
+      - name: Connect VPN
+        uses: golfzaptw/action-connect-ovpn@master
+        id: connect_vpn
+        with:
+          FILE_OVPN: '.github/vpn/${{ inputs.branch }}.ovpn'
+        env:
+          CA_CRT: ${{ secrets.CA_CRT}}
+          USER_CRT: ${{ secrets.USER_CRT }}
+          USER_KEY: ${{ secrets.USER_KEY }}
+
+      - name: Check Connect VPN
+        run: echo ${{ steps.connect_vpn.outputs.STATUS }}
 
       - name: Configure ECS AWS credentials
         if: contains(steps.affected-apps.outputs.apps, inputs.name)
