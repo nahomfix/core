@@ -1,5 +1,5 @@
 import { aql } from 'arangojs'
-import fetch from 'node-fetch'
+import fetch, { Response } from 'node-fetch'
 import slugify from 'slugify'
 import { VideoType } from '../src/app/__generated__/graphql'
 import { ArangoDB } from './db'
@@ -463,95 +463,140 @@ async function getVideo(videoId: string): Promise<Video | undefined> {
   return await rst.next()
 }
 
+async function getAllVideos(offset: number, count: number): Promise<Video[]> {
+  const rst = await db.query(aql`
+  FOR item IN ${db.collection('videos')}
+    LIMIT ${offset}, ${count}
+    RETURN item`)
+  return await rst.all()
+}
+
+async function sleep(milliseconds: number): Promise<void> {
+  return await new Promise((resolve) => setTimeout(resolve, milliseconds))
+}
+
+function getMillisToSleep(retryHeaderString): number {
+  return Math.round(parseFloat(retryHeaderString) * 1000)
+}
+
+async function fetchAndRetryIfNecessary(
+  mediaComponentId: string,
+  languageId: string
+): Promise<Response> {
+  const response = await fetch(
+    `https://www.jesusfilm.org/bin/jf/watch.html/${mediaComponentId}/${languageId}`,
+    { redirect: 'manual' }
+  )
+  if (response.status === 429) {
+    const retryAfter = response.headers.get('retry-after')
+    const millisToSleep = getMillisToSleep(retryAfter)
+    await sleep(millisToSleep)
+    return await fetchAndRetryIfNecessary(mediaComponentId, languageId)
+  }
+  return response
+}
+
 async function main(): Promise<void> {
-  if (!(await db.collection('videos').exists())) {
-    await db.createCollection('videos', { keyOptions: { type: 'uuid' } })
-  }
-
-  if (!(await db.collection('videoTags').exists())) {
-    await db.createCollection('videoTags', { keyOptions: { type: 'uuid' } })
-  }
-
-  await db.collection('videos').ensureIndex({
-    name: 'language_id',
-    type: 'persistent',
-    fields: ['variants[*].languageId']
-  })
-
-  const view = {
-    links: {
-      videos: {
-        fields: {
-          tagIds: {
-            analyzers: ['identity']
-          },
-          variants: {
-            fields: {
-              languageId: {
-                analyzers: ['identity']
-              },
-              subtitle: {
-                fields: {
-                  languageId: {
-                    analyzers: ['identity']
-                  }
-                }
-              }
-            }
-          },
-          title: {
-            fields: {
-              value: {
-                analyzers: ['text_en']
-              }
-            }
-          },
-          type: {
-            analyzers: ['identity']
-          },
-          episodeIds: {
-            analyzers: ['identity']
-          },
-          slug: {
-            analyzers: ['identity']
-          }
-        }
-      }
-    }
-  }
-  if (await db.view('videosView').exists()) {
-    console.log('updating view')
-    await db.view('videosView').updateProperties(view)
-  } else {
-    console.log('creating view')
-    await db.createView('videosView', view)
-  }
-  console.log('view created')
-
-  const languages = await getLanguages()
-  for (const content of await getMediaComponents('content')) {
-    await digestContent(languages, content)
-  }
-
-  for (const container of await getMediaComponents('container')) {
-    await digestContainer(languages, container)
-  }
-
-  await db.collection('videos').ensureIndex({
-    name: 'slug',
-    type: 'persistent',
-    fields: ['slug[*].value'],
-    unique: true
-  })
-
-  for (const key in tags) {
-    await db.collection('videoTags').save(
-      {
-        _key: tags[key]._key,
-        title: tags[key].title
-      },
-      { overwriteMode: 'update' }
-    )
+  // if (!(await db.collection('videos').exists())) {
+  //   await db.createCollection('videos', { keyOptions: { type: 'uuid' } })
+  // }
+  // if (!(await db.collection('videoTags').exists())) {
+  //   await db.createCollection('videoTags', { keyOptions: { type: 'uuid' } })
+  // }
+  // await db.collection('videos').ensureIndex({
+  //   name: 'language_id',
+  //   type: 'persistent',
+  //   fields: ['variants[*].languageId']
+  // })
+  // const view = {
+  //   links: {
+  //     videos: {
+  //       fields: {
+  //         tagIds: {
+  //           analyzers: ['identity']
+  //         },
+  //         variants: {
+  //           fields: {
+  //             languageId: {
+  //               analyzers: ['identity']
+  //             },
+  //             subtitle: {
+  //               fields: {
+  //                 languageId: {
+  //                   analyzers: ['identity']
+  //                 }
+  //               }
+  //             }
+  //           }
+  //         },
+  //         title: {
+  //           fields: {
+  //             value: {
+  //               analyzers: ['text_en']
+  //             }
+  //           }
+  //         },
+  //         type: {
+  //           analyzers: ['identity']
+  //         },
+  //         episodeIds: {
+  //           analyzers: ['identity']
+  //         },
+  //         slug: {
+  //           analyzers: ['identity']
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
+  // if (await db.view('videosView').exists()) {
+  //   console.log('updating view')
+  //   await db.view('videosView').updateProperties(view)
+  // } else {
+  //   console.log('creating view')
+  //   await db.createView('videosView', view)
+  // }
+  // console.log('view created')
+  // const languages = await getLanguages()
+  // for (const content of await getMediaComponents('content')) {
+  //   await digestContent(languages, content)
+  // }
+  // for (const container of await getMediaComponents('container')) {
+  //   await digestContainer(languages, container)
+  // }
+  // await db.collection('videos').ensureIndex({
+  //   name: 'slug',
+  //   type: 'persistent',
+  //   fields: ['slug[*].value'],
+  //   unique: true
+  // })
+  // for (const key in tags) {
+  //   await db.collection('videoTags').save(
+  //     {
+  //       _key: tags[key]._key,
+  //       title: tags[key].title
+  //     },
+  //     { overwriteMode: 'update' }
+  //   )
+  // }
+  let hasNext = true
+  let offset = 0
+  const count = 10
+  while (hasNext) {
+    const videos = await getAllVideos(offset, count)
+    videos.forEach((video) => {
+      video.variants.forEach((videoVariant) => {
+        void (async () => {
+          const response = await fetchAndRetryIfNecessary(
+            video._key,
+            videoVariant.languageId
+          )
+          console.log(response.headers.get('location'))
+        })()
+      })
+    })
+    offset = offset + count
+    hasNext = videos.length > 0
   }
 }
 main().catch((e) => {
