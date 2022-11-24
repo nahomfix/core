@@ -1,6 +1,7 @@
 import { aql } from 'arangojs'
-import fetch, { Response } from 'node-fetch'
+import fetch from 'node-fetch'
 import slugify from 'slugify'
+import { flatMap } from 'lodash'
 import { VideoType } from '../src/app/__generated__/graphql'
 import { ArangoDB } from './db'
 
@@ -471,29 +472,33 @@ async function getAllVideos(offset: number, count: number): Promise<Video[]> {
   return await rst.all()
 }
 
-async function sleep(milliseconds: number): Promise<void> {
-  return await new Promise((resolve) => setTimeout(resolve, milliseconds))
+async function sleep(seconds = 1): Promise<void> {
+  return await new Promise((resolve) => setTimeout(resolve, seconds * 1000))
 }
 
-function getMillisToSleep(retryHeaderString): number {
-  return Math.round(parseFloat(retryHeaderString) * 1000)
-}
-
-async function fetchAndRetryIfNecessary(
+async function getVideoPath(
   mediaComponentId: string,
   languageId: string
-): Promise<Response> {
-  const response = await fetch(
-    `https://www.jesusfilm.org/bin/jf/watch.html/${mediaComponentId}/${languageId}`,
-    { redirect: 'manual' }
-  )
-  if (response.status === 429) {
-    const retryAfter = response.headers.get('retry-after')
-    const millisToSleep = getMillisToSleep(retryAfter)
-    await sleep(millisToSleep)
-    return await fetchAndRetryIfNecessary(mediaComponentId, languageId)
+): Promise<string | undefined> {
+  let retry = 3
+
+  while (retry > 0) {
+    try {
+      const response = await fetch(
+        `https://4b7b842f-ffbe-4829-8117-3138356f72f4.jesusfilm.org/bin/jf/watch.html/${mediaComponentId}/${languageId}`,
+        { redirect: 'manual' }
+      )
+      return response.headers.get('location') ?? undefined
+    } catch (e) {
+      retry = retry - 1
+      if (retry === 0) {
+        throw e
+      }
+      console.log('pausing..')
+      await sleep()
+      console.log('done pausing...')
+    }
   }
-  return response
 }
 
 async function main(): Promise<void> {
@@ -581,22 +586,22 @@ async function main(): Promise<void> {
   // }
   let hasNext = true
   let offset = 0
-  const count = 10
+  const count = 5
   while (hasNext) {
     const videos = await getAllVideos(offset, count)
-    videos.forEach((video) => {
-      video.variants.forEach((videoVariant) => {
-        void (async () => {
-          const response = await fetchAndRetryIfNecessary(
-            video._key,
-            videoVariant.languageId
-          )
-          console.log(response.headers.get('location'))
-        })()
+    await Promise.all(
+      flatMap(videos, (video) => {
+        return video.variants.map(async (videoVariant) => {
+          const path = await getVideoPath(video._key, videoVariant.languageId)
+          console.log(video._key, videoVariant.languageId, path)
+        })
       })
-    })
+    )
     offset = offset + count
     hasNext = videos.length > 0
+    console.log('pausing..')
+    await sleep(1)
+    console.log('done pausing...')
   }
 }
 main().catch((e) => {
