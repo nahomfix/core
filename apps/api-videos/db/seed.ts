@@ -1,7 +1,7 @@
 import { aql } from 'arangojs'
 import fetch from 'node-fetch'
 import slugify from 'slugify'
-import { flatMap } from 'lodash'
+import { flatten } from 'lodash'
 import { VideoType } from '../src/app/__generated__/graphql'
 import { ArangoDB } from './db'
 
@@ -464,16 +464,20 @@ async function getVideo(videoId: string): Promise<Video | undefined> {
   return await rst.next()
 }
 
-async function getAllVideos(offset: number, count: number): Promise<Video[]> {
+async function getVideoIds(): Promise<
+  Array<{ mediaComponentId: string; languageId: string }>
+> {
   const rst = await db.query(aql`
-  FOR item IN ${db.collection('videos')}
-    LIMIT ${offset}, ${count}
-    RETURN item`)
-  return await rst.all()
+  FOR item IN videos
+    RETURN item.variants[
+      * RETURN { mediaComponentId: item._key, languageId: CURRENT.languageId }
+    ]
+  `)
+  return flatten(await rst.all())
 }
 
-async function sleep(seconds = 1): Promise<void> {
-  return await new Promise((resolve) => setTimeout(resolve, seconds * 1000))
+async function sleep(ms = 1000): Promise<void> {
+  return await new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 async function getVideoPath(
@@ -488,7 +492,11 @@ async function getVideoPath(
         `https://4b7b842f-ffbe-4829-8117-3138356f72f4.jesusfilm.org/bin/jf/watch.html/${mediaComponentId}/${languageId}`,
         { redirect: 'manual' }
       )
-      return response.headers.get('location') ?? undefined
+      return (
+        response.headers
+          .get('location')
+          ?.replace('https://www.jesusfilm.org/', '') ?? undefined
+      )
     } catch (e) {
       retry = retry - 1
       if (retry === 0) {
@@ -584,24 +592,32 @@ async function main(): Promise<void> {
   //     { overwriteMode: 'update' }
   //   )
   // }
-  let hasNext = true
   let offset = 0
-  const count = 5
-  while (hasNext) {
-    const videos = await getAllVideos(offset, count)
+  const count = 1
+  const videos = await getVideoIds()
+  while (offset < videos.length) {
     await Promise.all(
-      flatMap(videos, (video) => {
-        return video.variants.map(async (videoVariant) => {
-          const path = await getVideoPath(video._key, videoVariant.languageId)
-          console.log(video._key, videoVariant.languageId, path)
+      videos
+        .slice(offset, offset + count)
+        .map(async ({ mediaComponentId, languageId }) => {
+          const path = await getVideoPath(mediaComponentId, languageId)
+          console.log('path:', mediaComponentId, languageId, path)
+          if (path === undefined) return
+
+          await db.query(aql`
+          FOR video in videos
+            FILTER video._key == ${mediaComponentId}
+            UPDATE video WITH {
+              variants: (
+                FOR variant IN video.variants
+                  RETURN variant.languageId == ${languageId} ?
+                    MERGE(variant, { path: ${path}}) : variant
+              )
+            } IN videos
+          `)
         })
-      })
     )
     offset = offset + count
-    hasNext = videos.length > 0
-    console.log('pausing..')
-    await sleep(1)
-    console.log('done pausing...')
   }
 }
 main().catch((e) => {
