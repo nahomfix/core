@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { Story, Meta } from '@storybook/react'
 import { screen, userEvent } from '@storybook/testing-library'
 import Box from '@mui/material/Box'
-import { simpleComponentConfig } from '../../libs/storybook'
-import { GetLanguages_languages as Language } from '../../../__generated__/GetLanguages'
+import { simpleComponentConfig } from '../../../../../../apps/journeys-admin/src/libs/storybook'
+import { GetLanguages_languages as Language } from '../../../../../../apps/journeys-admin/__generated__/GetLanguages'
 import { LanguageSelect, LanguageSelectOption } from '.'
 
 const LanguageSelectStory = {

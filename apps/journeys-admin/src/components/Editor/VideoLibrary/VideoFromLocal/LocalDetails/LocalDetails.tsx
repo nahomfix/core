@@ -9,11 +9,11 @@ import Check from '@mui/icons-material/Check'
 import Chip from '@mui/material/Chip'
 import Skeleton from '@mui/material/Skeleton'
 import { gql, useLazyQuery } from '@apollo/client'
+import { LanguageSelectOption } from '@core/shared/ui/LanguageSelect'
 import { GetVideo } from '../../../../../../__generated__/GetVideo'
 import { VideoBlockSource } from '../../../../../../__generated__/globalTypes'
 import { VideoLanguage } from '../../VideoLanguage'
 import 'video.js/dist/video-js.css'
-import { LanguageSelectOption } from '../../../../LanguageSelect'
 import type { VideoDetailsProps } from '../../VideoDetails/VideoDetails'
 
 export const GET_VIDEO = gql`

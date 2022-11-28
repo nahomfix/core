@@ -4,7 +4,7 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import CircularProgress from '@mui/material/CircularProgress'
-import { GetLanguages_languages as Language } from '../../../__generated__/GetLanguages'
+import { GetLanguages_languages as Language } from '../../../../../../apps/journeys-admin/__generated__/GetLanguages'
 
 export interface LanguageSelectOption {
   id: string
@@ -68,7 +68,7 @@ export function LanguageSelect({
           {...params}
           hiddenLabel
           placeholder="Search Language"
-          variant="filled"
+          variant="outlined"
           InputProps={{
             ...params.InputProps,
             sx: { paddingBottom: 2 },

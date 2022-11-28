@@ -1,5 +1,5 @@
 import { fireEvent, render } from '@testing-library/react'
-import { GetLanguages_languages as Language } from '../../../__generated__/GetLanguages'
+import { GetLanguages_languages as Language } from '../../../../../../apps/journeys-admin/__generated__/GetLanguages'
 import { LanguageSelect } from '.'
 
 describe('LanguageSelect', () => {
