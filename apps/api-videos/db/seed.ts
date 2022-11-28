@@ -480,7 +480,7 @@ async function sleep(ms = 1000): Promise<void> {
   return await new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function getVideoPath(
+async function getVideoSlug(
   mediaComponentId: string,
   languageId: string
 ): Promise<string | undefined> {
@@ -593,31 +593,26 @@ async function main(): Promise<void> {
   //   )
   // }
   let offset = 0
-  const count = 1
   const videos = await getVideoIds()
   while (offset < videos.length) {
-    await Promise.all(
-      videos
-        .slice(offset, offset + count)
-        .map(async ({ mediaComponentId, languageId }) => {
-          const path = await getVideoPath(mediaComponentId, languageId)
-          console.log('path:', mediaComponentId, languageId, path)
-          if (path === undefined) return
-
-          await db.query(aql`
-          FOR video in videos
-            FILTER video._key == ${mediaComponentId}
-            UPDATE video WITH {
-              variants: (
-                FOR variant IN video.variants
-                  RETURN variant.languageId == ${languageId} ?
-                    MERGE(variant, { path: ${path}}) : variant
-              )
-            } IN videos
-          `)
-        })
-    )
-    offset = offset + count
+    const { mediaComponentId, languageId } = videos[offset]
+    const slug = await getVideoSlug(mediaComponentId, languageId)
+    console.log('slug:', offset, mediaComponentId, languageId, slug)
+    if (slug !== undefined) {
+      await db.query(aql`
+    FOR video in videos
+      FILTER video._key == ${mediaComponentId}
+      LIMIT 1
+      UPDATE video WITH {
+        variants: (
+          FOR variant IN video.variants
+            RETURN variant.languageId == ${languageId} ?
+              MERGE(variant, { slug: ${slug}}) : variant
+        )
+      } IN videos
+    `)
+    }
+    offset++
   }
 }
 main().catch((e) => {
