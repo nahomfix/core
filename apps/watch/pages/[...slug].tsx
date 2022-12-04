@@ -21,13 +21,14 @@ import {
 import { PageWrapper } from '../src/components/PageWrapper'
 import { VideosCarousel } from '../src/components/Videos/VideosCarousel/VideosCarousel'
 import { VideoHero, SimpleHero } from '../src/components/Hero'
+import { DownloadDialog } from '../src/components/Video/Download/DownloadDialog'
 import { ShareDialog } from '../src/components/ShareDialog'
 
 export const GET_VIDEO = gql`
   query GetVideo($id: ID!, $languageId: ID) {
     video(id: $id, idType: slug) {
       id
-      label
+      type
       image
       snippet(languageId: $languageId, primary: true) {
         value
@@ -44,44 +45,18 @@ export const GET_VIDEO = gql`
       variant {
         duration
         hls
-        language {
-          id
-          name(languageId: $languageId, primary: true) {
-            value
-          }
+        downloads {
+          quality
+          size
+          url
         }
       }
-      slug
-      children {
+      episodes {
         id
-        label
+        type
         title(languageId: $languageId, primary: true) {
           value
         }
-        image
-        imageAlt(languageId: $languageId, primary: true) {
-          value
-        }
-        slug
-        children {
-          id
-        }
-        variant {
-          duration
-          hls
-        }
-      }
-    }
-  }
-`
-
-export const GET_VIDEO_SIBLINGS = gql`
-  query GetVideoSiblings($id: ID!, $languageId: ID) {
-    video(id: $id, idType: slug) {
-      id
-      children {
-        id
-        label
         image
         imageAlt(languageId: $languageId, primary: true) {
           value
@@ -89,17 +64,50 @@ export const GET_VIDEO_SIBLINGS = gql`
         snippet(languageId: $languageId, primary: true) {
           value
         }
-        title(languageId: $languageId, primary: true) {
+        slug(languageId: $languageId, primary: true) {
           value
         }
+        episodeIds
         variant {
           duration
           hls
         }
-        children {
-          id
+      }
+      slug(languageId: $languageId, primary: true) {
+        value
+      }
+      variantLanguages {
+        id
+        name(languageId: $languageId, primary: true) {
+          value
         }
-        slug
+      }
+    }
+  }
+`
+
+export const GET_VIDEO_SIBLINGS = gql`
+  query GetVideoSiblings($playlistId: ID!, $languageId: ID) {
+    episodes(playlistId: $playlistId, idType: slug) {
+      id
+      type
+      image
+      imageAlt(languageId: $languageId, primary: true) {
+        value
+      }
+      snippet(languageId: $languageId, primary: true) {
+        value
+      }
+      title(languageId: $languageId, primary: true) {
+        value
+      }
+      variant {
+        duration
+        hls
+      }
+      episodeIds
+      slug(languageId: $languageId, primary: true) {
+        value
       }
     }
   }
@@ -115,6 +123,7 @@ export default function SeoFriendly(): ReactElement {
   const { routes } = routeParser(slug)
   const languageContext = useLanguage()
   const [tabValue, setTabValue] = useState(0)
+  const [downloadOpen, setDownloadOpen] = useState(false)
   const [openShare, setOpenShare] = useState(false)
 
   const handleTabChange = (_event, newValue): void => {
@@ -128,11 +137,11 @@ export default function SeoFriendly(): ReactElement {
     }
   })
 
-  const id = routes?.[routes.length - 2]
+  const playlistId = routes?.[routes.length - 2]
   const { data: siblingsData } = useQuery(GET_VIDEO_SIBLINGS, {
-    skip: id == null,
+    skip: playlistId == null,
     variables: {
-      id: id ?? '',
+      playlistId: playlistId ?? '',
       languageId: router.locale ?? router.defaultLocale
     }
   })
@@ -164,15 +173,15 @@ export default function SeoFriendly(): ReactElement {
         {data?.video != null && (
           <>
             <Box sx={{ pt: '20px' }}>
-              {data.video.children.length > 0 && (
+              {data.video.episodes.length > 0 && (
                 <VideosCarousel
-                  videos={data.video.children}
+                  videos={data.video.episodes}
                   routePrefix={routes.join('/')}
                 />
               )}
-              {siblingsData?.video.children?.length > 0 && (
+              {siblingsData?.episodes?.length > 0 && (
                 <VideosCarousel
-                  videos={siblingsData.video.children}
+                  videos={siblingsData.episodes}
                   routePrefix={getSiblingRoute(routes).join('/')}
                 />
               )}
@@ -210,10 +219,15 @@ export default function SeoFriendly(): ReactElement {
               </Box>
               <Box width="336px">
                 <Stack direction="row" spacing="20px" mb="40px">
-                  <Button variant="outlined">
-                    <SaveAlt />
-                    &nbsp; Download
-                  </Button>
+                  {data.video.variant.downloads.length > 0 && (
+                    <Button
+                      variant="outlined"
+                      onClick={() => setDownloadOpen(true)}
+                    >
+                      <SaveAlt />
+                      &nbsp; Download
+                    </Button>
+                  )}
                   <Button variant="outlined" onClick={() => setOpenShare(true)}>
                     <Share />
                     &nbsp; Share
@@ -227,6 +241,16 @@ export default function SeoFriendly(): ReactElement {
               routes={routes}
               onClose={() => setOpenShare(false)}
             />
+            {data.video.variant.downloads.length > 0 && (
+              <DownloadDialog
+                open={downloadOpen}
+                title={data.video.title[0].value}
+                downloads={data.video.variant.downloads}
+                onClose={() => {
+                  setDownloadOpen(false)
+                }}
+              />
+            )}
           </>
         )}
       </PageWrapper>
