@@ -28,6 +28,8 @@ const journey: Journey = {
   language: {
     __typename: 'Language',
     id: '529',
+    bcp47: 'en',
+    iso3: 'eng',
     name: [
       {
         __typename: 'Translation',
@@ -51,6 +53,7 @@ const journey: Journey = {
   ] as TreeBlock[],
   primaryImageBlock: null,
   userJourneys: [],
+  template: null,
   seoTitle: null,
   seoDescription: null
 }
@@ -75,6 +78,8 @@ describe('JourneyContext', () => {
       language: {
         __typename: 'Language',
         id: '529',
+        bcp47: 'en',
+        iso3: 'eng',
         name: [
           {
             __typename: 'Translation',
@@ -85,6 +90,7 @@ describe('JourneyContext', () => {
       },
       description: 'my cool journey',
       status: JourneyStatus.draft,
+      template: null,
       createdAt: '2021-11-19T12:34:56.647Z',
       publishedAt: null,
       blocks: [

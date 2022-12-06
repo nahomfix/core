@@ -1,15 +1,27 @@
 import videojs from 'video.js'
-import { ReactElement, useEffect, useRef, useState, useMemo } from 'react'
+import {
+  ReactElement,
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+  CSSProperties
+} from 'react'
 import { NextImage } from '@core/shared/ui/NextImage'
 import Box from '@mui/material/Box'
 import { useTheme } from '@mui/material/styles'
 import Paper from '@mui/material/Paper'
 import VideocamRounded from '@mui/icons-material/VideocamRounded'
+import {
+  VideoBlockObjectFit,
+  VideoBlockSource
+} from '../../../__generated__/globalTypes'
 import type { TreeBlock } from '../../libs/block'
 import { useEditor } from '../../libs/EditorProvider'
 import { blurImage } from '../../libs/blurImage'
 import { ImageFields } from '../Image/__generated__/ImageFields'
 import { VideoTrigger } from '../VideoTrigger'
+import 'videojs-youtube'
 import 'video.js/dist/video-js.css'
 import { VideoEvents } from '../VideoEvents'
 import { VideoFields } from './__generated__/VideoFields'
@@ -20,13 +32,18 @@ const VIDEO_FOREGROUND_COLOR = '#FFF'
 export function Video({
   id: blockId,
   video,
+  source,
+  videoId,
+  image,
+  title,
   autoplay,
   startAt,
   endAt,
   muted,
   posterBlockId,
   children,
-  action
+  action,
+  objectFit
 }: TreeBlock<VideoFields>): ReactElement {
   const [loading, setLoading] = useState(true)
   const theme = useTheme()
@@ -76,6 +93,9 @@ export function Video({
       })
       playerRef.current.on('ready', () => {
         playerRef.current?.currentTime(startAt ?? 0)
+        // plays youTube videos at the start time
+        if (source === VideoBlockSource.youTube && autoplay === true)
+          playerRef.current?.play()
       })
 
       if (selectedBlock === undefined) {
@@ -112,7 +132,8 @@ export function Video({
     blockId,
     posterBlock,
     selectedBlock,
-    blurBackground
+    blurBackground,
+    source
   ])
 
   useEffect(() => {
@@ -120,6 +141,31 @@ export function Video({
       playerRef.current?.pause()
     }
   }, [selectedBlock])
+
+  const eventVideoTitle = video?.title[0].value ?? title
+  const eventVideoId = video?.id ?? videoId
+
+  const videoImage = source === VideoBlockSource.internal ? video?.image : image
+
+  let videoFit: CSSProperties['objectFit']
+  if (source === VideoBlockSource.youTube) {
+    videoFit = 'contain'
+  } else {
+    switch (objectFit) {
+      case VideoBlockObjectFit.fill:
+        videoFit = 'cover'
+        break
+      case VideoBlockObjectFit.fit:
+        videoFit = 'contain'
+        break
+      case VideoBlockObjectFit.zoomed:
+        videoFit = 'contain'
+        break
+      default:
+        videoFit = 'cover'
+        break
+    }
+  }
 
   return (
     <Box
@@ -143,10 +189,15 @@ export function Video({
           height: '100%',
           minHeight: 'inherit',
           '> .vjs-tech': {
-            objectFit: 'cover'
+            objectFit: videoFit,
+            transform:
+              objectFit === VideoBlockObjectFit.zoomed
+                ? 'scale(1.33)'
+                : undefined
           },
           '> .vjs-loading-spinner': {
-            zIndex: 1
+            zIndex: 1,
+            display: source === VideoBlockSource.youTube ? 'none' : 'block'
           },
           '> .vjs-big-play-button': {
             zIndex: 1
@@ -164,27 +215,49 @@ export function Video({
           '&:hover': {
             color: VIDEO_FOREGROUND_COLOR
           }
+        },
+        // renders big play button for youtube videos on iOS devices
+        'video::-webkit-media-controls-start-playback-button': {
+          display: 'none'
+        },
+        '> .video-js.vjs-controls-enabled .vjs-big-play-button': {
+          display: 'none'
+        },
+        '> .video-js.vjs-controls-enabled.vjs-paused .vjs-big-play-button': {
+          display: 'block'
         }
       }}
     >
-      {playerRef.current != null && video != null && (
-        <VideoEvents
-          player={playerRef.current}
-          blockId={blockId}
-          videoTitle={video.title[0].value}
-          videoId={video.id}
-          startAt={startAt}
-          endAt={endAt}
-        />
-      )}
-      {video?.variant?.hls != null ? (
+      {playerRef.current != null &&
+        eventVideoTitle != null &&
+        eventVideoId != null && (
+          <VideoEvents
+            player={playerRef.current}
+            blockId={blockId}
+            videoTitle={eventVideoTitle}
+            source={source}
+            videoId={eventVideoId}
+            startAt={startAt}
+            endAt={endAt}
+          />
+        )}
+      {videoId != null ? (
         <>
           <video
             ref={videoRef}
             className="video-js vjs-big-play-centered"
             playsInline
           >
-            <source src={video.variant.hls} type="application/x-mpegURL" />
+            {source === VideoBlockSource.internal &&
+              video?.variant?.hls != null && (
+                <source src={video.variant.hls} type="application/x-mpegURL" />
+              )}
+            {source === VideoBlockSource.youTube && (
+              <source
+                src={`https://www.youtube.com/watch?v=${videoId}`}
+                type="video/youtube"
+              />
+            )}
           </video>
           {children?.map(
             (option) =>
@@ -229,13 +302,22 @@ export function Video({
           </Paper>
         </>
       )}
+      {/* Video Image  */}
+      {videoImage != null && posterBlock?.src == null && loading && (
+        <NextImage
+          src={videoImage}
+          alt="video image"
+          layout="fill"
+          objectFit="cover"
+        />
+      )}
       {/* Lazy load higher res poster */}
       {posterBlock?.src != null && loading && (
         <NextImage
           src={posterBlock.src}
           alt={posterBlock.alt}
           placeholder={blurBackground != null ? 'blur' : 'empty'}
-          blurDataURL={blurBackground ?? posterBlock.src}
+          blurDataURL={blurBackground}
           layout="fill"
           objectFit="cover"
         />

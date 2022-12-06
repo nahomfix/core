@@ -16,7 +16,8 @@ import {
   IconSize,
   ThemeMode,
   ThemeName,
-  TypographyVariant
+  TypographyVariant,
+  VideoBlockSource
 } from '../../../../__generated__/globalTypes'
 import { Canvas } from '.'
 
@@ -405,6 +406,12 @@ const steps: Array<TreeBlock<StepBlock>> = [
             muted: true,
             videoId: '2_0-FallingPlates',
             videoVariantLanguageId: '529',
+            source: VideoBlockSource.internal,
+            title: null,
+            description: null,
+            duration: null,
+            image: null,
+            objectFit: null,
             video: {
               __typename: 'Video',
               id: '2_0-FallingPlates',
@@ -579,7 +586,7 @@ const steps: Array<TreeBlock<StepBlock>> = [
   }
 ]
 
-const Template: Story = () => {
+const Template: Story = ({ ...args }) => {
   return (
     <MockedProvider>
       <JourneyProvider
@@ -587,7 +594,8 @@ const Template: Story = () => {
           journey: {
             id: 'journeyId',
             themeMode: ThemeMode.light,
-            themeName: ThemeName.base
+            themeName: ThemeName.base,
+            ...args
           } as unknown as Journey,
           admin: true
         }}
@@ -601,5 +609,36 @@ const Template: Story = () => {
 }
 
 export const Default = Template.bind({})
+Default.args = {
+  language: {
+    __typename: 'Language',
+    id: '529',
+    bcp47: 'en',
+    iso3: 'eng',
+    name: [
+      {
+        __typename: 'Translation',
+        value: 'English',
+        primary: true
+      }
+    ]
+  }
+}
+
+export const RTL = Template.bind({})
+RTL.args = {
+  language: {
+    __typename: 'Language',
+    id: '529',
+    bcp47: 'ar',
+    name: [
+      {
+        __typename: 'Translation',
+        value: 'Arabic',
+        primary: true
+      }
+    ]
+  }
+}
 
 export default CanvasStory as Meta

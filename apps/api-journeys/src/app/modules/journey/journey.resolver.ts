@@ -35,11 +35,14 @@ import {
   UserJourney,
   UserJourneyRole,
   JourneysFilter,
+  JourneyTemplateInput,
   JourneysReportType,
   Role
 } from '../../__generated__/graphql'
 import { UserJourneyService } from '../userJourney/userJourney.service'
 import { RoleGuard } from '../../lib/roleGuard/roleGuard'
+import { UserRoleService } from '../userRole/userRole.service'
+import { MemberService } from '../member/member.service'
 import { JourneyService } from './journey.service'
 
 const ERROR_ARANGO_UNIQUE_CONSTRAINT_VIOLATED = 1210
@@ -49,7 +52,9 @@ export class JourneyResolver {
   constructor(
     private readonly journeyService: JourneyService,
     private readonly blockService: BlockService,
-    private readonly userJourneyService: UserJourneyService
+    private readonly userJourneyService: UserJourneyService,
+    private readonly userRoleService: UserRoleService,
+    private readonly memberService: MemberService
   ) {}
 
   @Query()
@@ -100,9 +105,11 @@ export class JourneyResolver {
   @Query()
   async adminJourneys(
     @CurrentUserId() userId: string,
-    @Args('status') status: JourneyStatus[]
+    @Args('status') status: JourneyStatus[],
+    @Args('template') template?: boolean
   ): Promise<Journey[]> {
-    return await this.journeyService.getAllByOwnerEditor(userId, status)
+    const user = await this.userRoleService.getUserRoleById(userId)
+    return await this.journeyService.getAllByRole(user, status, template)
   }
 
   @Query()
@@ -116,16 +123,27 @@ export class JourneyResolver {
         ? await this.journeyService.getBySlug(id)
         : await this.journeyService.get(id)
     if (result == null) return null
-    const ujResult = await this.userJourneyService.forJourneyUser(
-      result.id,
-      userId
-    )
-    if (ujResult == null)
-      throw new ForbiddenError(
-        'User has not received an invitation to edit this journey.'
+    if (result.template !== true) {
+      const ujResult = await this.userJourneyService.forJourneyUser(
+        result.id,
+        userId
       )
-    if (ujResult.role === UserJourneyRole.inviteRequested)
-      throw new ForbiddenError('User invitation pending.')
+      if (ujResult == null)
+        throw new ForbiddenError(
+          'User has not received an invitation to edit this journey.'
+        )
+      if (ujResult.role === UserJourneyRole.inviteRequested)
+        throw new ForbiddenError('User invitation pending.')
+    } else {
+      if (result.status !== JourneyStatus.published) {
+        const urResult = await this.userRoleService.getUserRoleById(userId)
+        const isPublisher = urResult.roles?.includes(Role.publisher)
+        if (isPublisher !== true)
+          throw new ForbiddenError(
+            'You do not have access to unpublished templates'
+          )
+      }
+    }
 
     return result
   }
@@ -161,11 +179,14 @@ export class JourneyResolver {
     let retry = true
     while (retry) {
       try {
+        // this should be removed when the UI can support team management
+        const team = { id: 'jfp-team' }
         const journey: Journey = await this.journeyService.save({
           themeName: ThemeName.base,
           themeMode: ThemeMode.light,
           createdAt: new Date().toISOString(),
           status: JourneyStatus.draft,
+          teamId: team.id,
           ...input
         })
         await this.userJourneyService.save({
@@ -173,6 +194,14 @@ export class JourneyResolver {
           journeyId: journey.id,
           role: UserJourneyRole.owner
         })
+        await this.memberService.save(
+          {
+            id: `${userId}:${team.id}`,
+            userId,
+            teamId: team.id
+          },
+          { overwriteMode: 'ignore' }
+        )
         retry = false
         return journey
       } catch (err) {
@@ -351,11 +380,8 @@ export class JourneyResolver {
       { role: Role.publisher, attributes: { template: true } }
     ])
   )
-  async journeysArchive(
-    @CurrentUserId() userId: string,
-    @Args('ids') ids: string[]
-  ): Promise<Journey[]> {
-    const results = (await this.journeyService.getAllByIds(userId, ids)).map(
+  async journeysArchive(@Args('ids') ids: string[]): Promise<Journey[]> {
+    const results = (await this.journeyService.getAllByIds(ids)).map(
       (journey) => ({
         _key: journey.id,
         status: JourneyStatus.archived,
@@ -375,11 +401,8 @@ export class JourneyResolver {
       { role: Role.publisher, attributes: { template: true } }
     ])
   )
-  async journeysDelete(
-    @CurrentUserId() userId: string,
-    @Args('ids') ids: string[]
-  ): Promise<Journey[]> {
-    const results = (await this.journeyService.getAllByIds(userId, ids)).map(
+  async journeysDelete(@Args('ids') ids: string[]): Promise<Journey[]> {
+    const results = (await this.journeyService.getAllByIds(ids)).map(
       (journey) => ({
         _key: journey.id,
         status: JourneyStatus.deleted,
@@ -398,11 +421,8 @@ export class JourneyResolver {
       { role: Role.publisher, attributes: { template: true } }
     ])
   )
-  async journeysTrash(
-    @CurrentUserId() userId: string,
-    @Args('ids') ids: string[]
-  ): Promise<Journey[]> {
-    const results = (await this.journeyService.getAllByIds(userId, ids)).map(
+  async journeysTrash(@Args('ids') ids: string[]): Promise<Journey[]> {
+    const results = (await this.journeyService.getAllByIds(ids)).map(
       (journey) => ({
         _key: journey.id,
         status: JourneyStatus.trashed,
@@ -422,11 +442,8 @@ export class JourneyResolver {
       { role: Role.publisher, attributes: { template: true } }
     ])
   )
-  async journeysRestore(
-    @CurrentUserId() userId: string,
-    @Args('ids') ids: string[]
-  ): Promise<Journey[]> {
-    const results = (await this.journeyService.getAllByIds(userId, ids)).map(
+  async journeysRestore(@Args('ids') ids: string[]): Promise<Journey[]> {
+    const results = (await this.journeyService.getAllByIds(ids)).map(
       (journey) => ({
         _key: journey.id,
         status:
@@ -441,6 +458,15 @@ export class JourneyResolver {
     )) as unknown as Journey[]
   }
 
+  @Mutation()
+  @UseGuards(RoleGuard('id', { role: Role.publisher }))
+  async journeyTemplate(
+    @Args('id') id: string,
+    @Args('input') input: JourneyTemplateInput
+  ): Promise<Journey> {
+    return await this.journeyService.update(id, input)
+  }
+
   @ResolveField()
   async blocks(@Parent() journey: Journey): Promise<Block[]> {
     return await this.blockService.forJourney(journey)
@@ -451,7 +477,11 @@ export class JourneyResolver {
     @Parent() journey: Journey & { primaryImageBlockId?: string | null }
   ): Promise<ImageBlock | null> {
     if (journey.primaryImageBlockId == null) return null
-    return await this.blockService.get(journey.primaryImageBlockId)
+    const block: ImageBlock = await this.blockService.get(
+      journey.primaryImageBlockId
+    )
+    if (block.journeyId !== journey.id) return null
+    return block
   }
 
   @ResolveField()

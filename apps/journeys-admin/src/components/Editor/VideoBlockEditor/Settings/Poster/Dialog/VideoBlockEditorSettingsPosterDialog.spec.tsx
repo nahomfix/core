@@ -6,7 +6,8 @@ import { fireEvent, render, waitFor } from '@testing-library/react'
 import {
   JourneyStatus,
   ThemeMode,
-  ThemeName
+  ThemeName,
+  VideoBlockSource
 } from '../../../../../../../__generated__/globalTypes'
 
 import {
@@ -33,6 +34,8 @@ const journey: Journey = {
   language: {
     __typename: 'Language',
     id: '529',
+    bcp47: 'en',
+    iso3: 'eng',
     name: [
       {
         __typename: 'Translation',
@@ -47,6 +50,7 @@ const journey: Journey = {
   publishedAt: null,
   blocks: [] as TreeBlock[],
   primaryImageBlock: null,
+  template: null,
   userJourneys: [],
   seoTitle: null,
   seoDescription: null
@@ -65,6 +69,12 @@ const video: TreeBlock<VideoBlock> = {
   action: null,
   videoId: '2_0-FallingPlates',
   videoVariantLanguageId: '529',
+  source: VideoBlockSource.internal,
+  title: null,
+  description: null,
+  duration: null,
+  image: null,
+  objectFit: null,
   video: {
     __typename: 'Video',
     id: '2_0-FallingPlates',
@@ -173,7 +183,7 @@ describe('VideoBlockEditorSettingsPosterDialog', () => {
               selectedBlock={null}
               parentBlockId={video.id}
               onClose={onClose}
-              open={true}
+              open
             />
           </JourneyProvider>
         </MockedProvider>
@@ -251,7 +261,7 @@ describe('VideoBlockEditorSettingsPosterDialog', () => {
               selectedBlock={existingImageBlock}
               parentBlockId={video.id}
               onClose={onClose}
-              open={true}
+              open
             />
           </JourneyProvider>
         </MockedProvider>
@@ -330,7 +340,7 @@ describe('VideoBlockEditorSettingsPosterDialog', () => {
               selectedBlock={image}
               parentBlockId={video.id}
               onClose={onClose}
-              open={true}
+              open
             />
           </JourneyProvider>
         </MockedProvider>

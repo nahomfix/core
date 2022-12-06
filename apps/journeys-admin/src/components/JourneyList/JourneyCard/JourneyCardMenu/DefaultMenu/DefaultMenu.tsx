@@ -4,10 +4,10 @@ import PeopleIcon from '@mui/icons-material/People'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
 import Divider from '@mui/material/Divider'
-import Link from 'next/link'
+import NextLink from 'next/link'
 import { ApolloQueryResult } from '@apollo/client'
-import { MenuItem } from '../MenuItem'
-import { DuplicateJourneyMenuItem } from '../DuplicateJourneyMenuItem.tsx/DuplicateJourneyMenuItem'
+import { MenuItem } from '../../../../MenuItem'
+import { DuplicateJourneyMenuItem } from '../DuplicateJourneyMenuItem'
 import { JourneyStatus } from '../../../../../../__generated__/globalTypes'
 import { GetActiveJourneys } from '../../../../../../__generated__/GetActiveJourneys'
 import { GetArchivedJourneys } from '../../../../../../__generated__/GetArchivedJourneys'
@@ -23,6 +23,7 @@ interface DefaultMenuProps {
   setOpenAccessDialog: () => void
   handleCloseMenu: () => void
   setOpenTrashDialog: () => void
+  template?: boolean
   refetch?: () => Promise<
     ApolloQueryResult<
       GetActiveJourneys | GetArchivedJourneys | GetTrashedJourneys
@@ -39,40 +40,44 @@ export function DefaultMenu({
   setOpenAccessDialog,
   handleCloseMenu,
   setOpenTrashDialog,
+  template,
   refetch
 }: DefaultMenuProps): ReactElement {
   return (
     <>
-      <Link href={`/journeys/${journeyId}`} passHref>
+      <NextLink
+        href={
+          template === true
+            ? `/templates/${journeyId}`
+            : `/journeys/${journeyId}`
+        }
+        passHref
+      >
+        <MenuItem label="Edit" icon={<EditIcon color="secondary" />} />
+      </NextLink>
+
+      {template !== true && (
         <MenuItem
-          icon={<EditIcon color="secondary" />}
-          text="Edit"
-          options={{ component: 'a' }}
+          label="Access"
+          icon={<PeopleIcon color="secondary" />}
+          onClick={() => {
+            setOpenAccessDialog()
+            handleCloseMenu()
+          }}
         />
-      </Link>
+      )}
+      <NextLink href={`/api/preview?slug=${slug}`} passHref>
+        <MenuItem
+          label="Preview"
+          icon={<VisibilityIcon color="secondary" />}
+          disabled={!published}
+          openInNew
+        />
+      </NextLink>
 
-      <MenuItem
-        icon={<PeopleIcon color="secondary" />}
-        text="Access"
-        handleClick={() => {
-          setOpenAccessDialog()
-          handleCloseMenu()
-        }}
-      />
-
-      <MenuItem
-        icon={<VisibilityIcon color="secondary" />}
-        text="Preview"
-        options={{
-          disabled: !published,
-          component: 'a',
-          href: `/api/preview?slug=${slug}`,
-          target: '_blank',
-          rel: 'noopener'
-        }}
-      />
-
-      <DuplicateJourneyMenuItem id={id} handleCloseMenu={handleCloseMenu} />
+      {template !== true && (
+        <DuplicateJourneyMenuItem id={id} handleCloseMenu={handleCloseMenu} />
+      )}
 
       <Divider />
 
@@ -85,9 +90,9 @@ export function DefaultMenu({
       />
 
       <MenuItem
+        label="Trash"
         icon={<DeleteOutlineRoundedIcon color="secondary" />}
-        text="Trash"
-        handleClick={() => {
+        onClick={() => {
           setOpenTrashDialog()
           handleCloseMenu()
         }}

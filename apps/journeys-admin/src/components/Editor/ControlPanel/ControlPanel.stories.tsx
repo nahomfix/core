@@ -17,7 +17,8 @@ import {
   IconSize,
   TypographyVariant,
   ThemeMode,
-  ThemeName
+  ThemeName,
+  VideoBlockSource
 } from '../../../../__generated__/globalTypes'
 import { ControlPanel } from '.'
 
@@ -432,6 +433,11 @@ const steps: Array<TreeBlock<StepBlock>> = [
             muted: true,
             videoId: '2_0-FallingPlates',
             videoVariantLanguageId: '529',
+            source: VideoBlockSource.internal,
+            title: null,
+            description: null,
+            duration: null,
+            image: null,
             video: {
               __typename: 'Video',
               id: '2_0-FallingPlates',
@@ -454,6 +460,7 @@ const steps: Array<TreeBlock<StepBlock>> = [
             posterBlockId: null,
             fullsize: null,
             action: null,
+            objectFit: null,
             children: []
           }
         ]
@@ -614,7 +621,20 @@ const Template: Story = (args) => {
           journey: {
             id: 'journeyId',
             themeMode: ThemeMode.dark,
-            themeName: ThemeName.base
+            themeName: ThemeName.base,
+            language: {
+              __typename: 'Language',
+              id: '529',
+              bcp47: 'en',
+              iso3: 'eng',
+              name: [
+                {
+                  __typename: 'Translation',
+                  value: 'English',
+                  primary: true
+                }
+              ]
+            }
           } as unknown as Journey,
           admin: true
         }}

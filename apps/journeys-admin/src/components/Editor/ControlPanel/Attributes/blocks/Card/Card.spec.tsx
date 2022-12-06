@@ -7,7 +7,8 @@ import { SnackbarProvider } from 'notistack'
 import {
   JourneyStatus,
   ThemeMode,
-  ThemeName
+  ThemeName,
+  VideoBlockSource
 } from '../../../../../../../__generated__/globalTypes'
 import {
   GetJourney_journey as Journey,
@@ -64,6 +65,8 @@ describe('Card', () => {
       language: {
         __typename: 'Language',
         id: '529',
+        bcp47: 'en',
+        iso3: 'eng',
         name: [
           {
             __typename: 'Translation',
@@ -79,6 +82,7 @@ describe('Card', () => {
       blocks: [] as TreeBlock[],
       primaryImageBlock: null,
       userJourneys: [],
+      template: null,
       seoTitle: null,
       seoDescription: null
     }
@@ -194,6 +198,11 @@ describe('Card', () => {
             parentOrder: 0,
             videoId: '2_0-FallingPlates',
             videoVariantLanguageId: '529',
+            source: VideoBlockSource.internal,
+            title: null,
+            description: null,
+            duration: null,
+            image: null,
             video: {
               __typename: 'Video',
               id: '2_0-FallingPlates',
@@ -218,6 +227,7 @@ describe('Card', () => {
             endAt: null,
             fullsize: null,
             action: null,
+            objectFit: null,
             children: []
           }
         ]
@@ -233,9 +243,7 @@ describe('Card', () => {
         </MockedProvider>
       )
       expect(getByText('Background Video')).toBeInTheDocument()
-      expect(
-        getByText('https://arc.gt/hls/2_0-FallingPlates/529')
-      ).toBeInTheDocument()
+      expect(getByText('FallingPlates')).toBeInTheDocument()
     })
 
     it('shows background media drawer', () => {
@@ -257,6 +265,11 @@ describe('Card', () => {
             parentOrder: 0,
             videoId: '2_0-FallingPlates',
             videoVariantLanguageId: '529',
+            source: VideoBlockSource.internal,
+            title: null,
+            description: null,
+            duration: null,
+            image: null,
             video: {
               __typename: 'Video',
               id: '2_0-FallingPlates',
@@ -281,6 +294,7 @@ describe('Card', () => {
             endAt: null,
             fullsize: null,
             action: null,
+            objectFit: null,
             children: []
           }
         ]
@@ -297,7 +311,7 @@ describe('Card', () => {
           </ThemeProvider>
         </MockedProvider>
       )
-      fireEvent.click(getByText('https://arc.gt/hls/2_0-FallingPlates/529'))
+      fireEvent.click(getByText('FallingPlates'))
       expect(getByText('Background Media Properties')).toBeInTheDocument()
     })
   })

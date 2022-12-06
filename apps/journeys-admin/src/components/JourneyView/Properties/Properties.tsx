@@ -1,84 +1,71 @@
-import { ReactElement, useState } from 'react'
+import { ReactElement } from 'react'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Divider from '@mui/material/Divider'
-import Drawer from '@mui/material/Drawer'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
-import { CopyTextField } from '@core/shared/ui/CopyTextField'
 import { useJourney } from '@core/journeys/ui/JourneyProvider'
 import { useTranslation } from 'react-i18next'
-import EditIcon from '@mui/icons-material/Edit'
+import Paper from '@mui/material/Paper'
 import { AccessAvatars } from '../../AccessAvatars'
+import { JourneyLink } from '../JourneyLink'
+import type { JourneyType } from '../JourneyView'
 import { JourneyDetails } from './JourneyDetails'
-import { SlugDialog } from './SlugDialog'
+import { AccessControl } from './AccessControl'
 
-export function Properties(): ReactElement {
+interface PropertiesProps {
+  journeyType: JourneyType
+  isPublisher?: boolean
+}
+
+export function Properties({
+  journeyType,
+  isPublisher
+}: PropertiesProps): ReactElement {
   const { t } = useTranslation('apps-journeys-admin')
   const { journey } = useJourney()
-  const [showSlugDialog, setShowSlugDialog] = useState(false)
 
   return (
     <>
-      <Drawer
-        variant="permanent"
-        anchor="right"
+      <Paper
+        elevation={0}
         sx={{
           display: { xs: 'none', sm: 'block' },
-          '& .MuiDrawer-paper': {
-            boxSizing: 'border-box',
-            width: '328px'
-          }
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          height: '100%',
+          width: '328px',
+          borderLeft: 1,
+          borderColor: 'divider',
+          borderRadius: 0
         }}
       >
         <Toolbar>
           <Typography variant="subtitle1" component="div" sx={{ ml: 2 }}>
-            {t('Properties')}
+            {journeyType === 'Template' ? t('Details') : t('Properties')}
           </Typography>
         </Toolbar>
         <Stack sx={{ py: 6 }} spacing={6} divider={<Divider />}>
           <Box sx={{ px: 6 }}>
-            <JourneyDetails />
-          </Box>
-          <Box sx={{ px: 6 }}>
-            <Typography variant="subtitle2" gutterBottom>
-              {t('Access Control')}
-            </Typography>
-            <AccessAvatars
-              journeyId={journey?.id}
-              userJourneys={journey?.userJourneys ?? undefined}
-              size="medium"
-              xsMax={5}
+            <JourneyDetails
+              journeyType={journeyType}
+              isPublisher={isPublisher}
             />
           </Box>
-          <Box sx={{ px: 6 }}>
-            <Typography variant="subtitle2" gutterBottom>
-              {t('Journey URL')}
-            </Typography>
-            <CopyTextField
-              value={
-                journey?.slug != null
-                  ? `${
-                      process.env.NEXT_PUBLIC_JOURNEYS_URL ??
-                      'https://your.nextstep.is'
-                    }/${journey.slug}`
-                  : undefined
-              }
-            />
-            <Box sx={{ pt: 2 }}>
-              <Button
-                onClick={() => setShowSlugDialog(true)}
-                size="small"
-                startIcon={<EditIcon />}
-                disabled={journey == null}
-              >
-                {t('Edit URL')}
-              </Button>
-            </Box>
-          </Box>
+          {journeyType !== 'Template' && (
+            <>
+              <Box sx={{ px: 6 }}>
+                <AccessControl />
+              </Box>
+              <Divider />
+              <Box sx={{ px: 6 }}>
+                <JourneyLink />
+              </Box>
+            </>
+          )}
         </Stack>
-      </Drawer>
+      </Paper>
       <Stack
         sx={{
           display: {
@@ -90,21 +77,19 @@ export function Properties(): ReactElement {
         }}
         spacing={6}
       >
-        <Divider>
-          <AccessAvatars
-            journeyId={journey?.id}
-            userJourneys={journey?.userJourneys ?? undefined}
-            size="medium"
-          />
-        </Divider>
+        {journeyType !== 'Template' && (
+          <Divider>
+            <AccessAvatars
+              journeyId={journey?.id}
+              userJourneys={journey?.userJourneys ?? undefined}
+              size="medium"
+            />
+          </Divider>
+        )}
         <Box sx={{ px: 6 }}>
-          <JourneyDetails />
+          <JourneyDetails journeyType={journeyType} isPublisher={isPublisher} />
         </Box>
       </Stack>
-      <SlugDialog
-        open={showSlugDialog}
-        onClose={() => setShowSlugDialog(false)}
-      />
     </>
   )
 }

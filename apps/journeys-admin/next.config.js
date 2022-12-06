@@ -12,7 +12,10 @@ const nextConfig = {
       'images.unsplash.com',
       'localhost',
       'unsplash.com',
-      'imagizer.imageshack.com'
+      'imagizer.imageshack.com',
+      // arclight image provider - cloudfront
+      'd1wl257kev7hsz.cloudfront.net',
+      'i.ytimg.com'
     ]
   },
   nx: {
@@ -25,6 +28,11 @@ const nextConfig = {
       {
         source: '/journeys',
         destination: '/',
+        permanent: true
+      },
+      {
+        source: '/reports',
+        destination: '/reports/journeys',
         permanent: true
       }
     ]

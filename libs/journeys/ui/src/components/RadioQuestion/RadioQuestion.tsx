@@ -21,7 +21,6 @@ export const RADIO_QUESTION_SUBMISSION_EVENT_CREATE = gql`
   ) {
     radioQuestionSubmissionEventCreate(input: $input) {
       id
-      radioOptionBlockId
     }
   }
 `
@@ -57,7 +56,10 @@ export function RadioQuestion({
       ? getStepHeading(activeBlock.id, activeBlock.children, treeBlocks, t)
       : 'None'
 
-  const handleClick = (radioOptionBlockId: string): void => {
+  const handleClick = (
+    radioOptionBlockId: string,
+    radioOptionLabel: string
+  ): void => {
     if (!admin) {
       const id = uuid()
       void radioQuestionSubmissionEventCreate({
@@ -65,7 +67,10 @@ export function RadioQuestion({
           input: {
             id,
             blockId,
-            radioOptionBlockId
+            radioOptionBlockId,
+            stepId: activeBlock?.id,
+            label: heading,
+            value: radioOptionLabel
           }
         }
       })
@@ -100,7 +105,7 @@ export function RadioQuestion({
 
   return (
     <StyledRadioQuestion data-testid={`radioQuestion-${blockId}`}>
-      <ButtonGroup orientation="vertical" variant="contained" fullWidth={true}>
+      <ButtonGroup orientation="vertical" variant="contained" fullWidth>
         {options}
         {addOption}
       </ButtonGroup>

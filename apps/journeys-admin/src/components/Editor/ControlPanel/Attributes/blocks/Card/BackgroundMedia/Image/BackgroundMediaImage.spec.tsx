@@ -13,7 +13,8 @@ import {
 import {
   JourneyStatus,
   ThemeMode,
-  ThemeName
+  ThemeName,
+  VideoBlockSource
 } from '../../../../../../../../../__generated__/globalTypes'
 import {
   BackgroundMediaImage,
@@ -33,6 +34,8 @@ const journey: Journey = {
   language: {
     __typename: 'Language',
     id: '529',
+    bcp47: 'en',
+    iso3: 'eng',
     name: [
       {
         __typename: 'Translation',
@@ -48,6 +51,7 @@ const journey: Journey = {
   blocks: [] as TreeBlock[],
   primaryImageBlock: null,
   userJourneys: [],
+  template: null,
   seoTitle: null,
   seoDescription: null
 }
@@ -90,6 +94,12 @@ const video: TreeBlock<VideoBlock> = {
   action: null,
   videoId: '2_0-FallingPlates',
   videoVariantLanguageId: '529',
+  source: VideoBlockSource.internal,
+  title: null,
+  description: null,
+  duration: null,
+  image: null,
+  objectFit: null,
   video: {
     __typename: 'Video',
     id: '2_0-FallingPlates',

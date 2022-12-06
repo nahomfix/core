@@ -3,21 +3,26 @@ import { omit } from 'lodash'
 import {
   IdType,
   JourneyStatus,
+  Role,
   ThemeMode,
   ThemeName,
   UserJourneyRole
 } from '../../__generated__/graphql'
 import { UserJourneyService } from '../userJourney/userJourney.service'
 import { JourneyService } from '../journey/journey.service'
+import { UserRoleService } from '../userRole/userRole.service'
+import { MemberService } from '../member/member.service'
 import { UserJourneyResolver } from './userJourney.resolver'
 
 describe('UserJourneyResolver', () => {
-  let resolver: UserJourneyResolver, service: UserJourneyService
+  let resolver: UserJourneyResolver,
+    service: UserJourneyService,
+    mService: MemberService
 
   const userJourney = {
     id: '1',
     userId: '1',
-    journeyId: '2',
+    journeyId: '1',
     role: UserJourneyRole.editor
   }
 
@@ -38,6 +43,12 @@ describe('UserJourneyResolver', () => {
   const publishedAt = new Date('2021-11-19T12:34:56.647Z').toISOString()
   const createdAt = new Date('2021-11-19T12:34:56.647Z').toISOString()
 
+  const userRole = {
+    id: 'userRole.id',
+    userId: 'user.id',
+    roles: [Role.publisher]
+  }
+
   const journey = {
     id: '1',
     title: 'published',
@@ -49,7 +60,8 @@ describe('UserJourneyResolver', () => {
     primaryImageBlockId: '2',
     slug: 'published-slug',
     publishedAt,
-    createdAt
+    createdAt,
+    teamId: 'jfp-team'
   }
 
   const journeyService = {
@@ -71,21 +83,44 @@ describe('UserJourneyResolver', () => {
       }),
       getAll: jest.fn(() => [userJourney, userJourney]),
       remove: jest.fn((input) => input),
+      removeAll: jest.fn(() => [userJourney, userJourney]),
       save: jest.fn((input) => input),
       update: jest.fn((input) => input),
       forJourneyUser: jest.fn((key, userId) => {
         if (userId === actorUserJourney.userId) return actorUserJourney
         return userJourney
-      })
+      }),
+      forJourney: jest.fn(() => [userJourney, userJourney])
+    })
+  }
+
+  const userRoleService = {
+    provide: UserRoleService,
+    useFactory: () => ({
+      getUserRoleById: jest.fn(() => userRole)
+    })
+  }
+
+  const memberService = {
+    provide: MemberService,
+    useFactory: () => ({
+      save: jest.fn((member) => member)
     })
   }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [UserJourneyResolver, userJourneyService, journeyService]
+      providers: [
+        UserJourneyResolver,
+        userJourneyService,
+        journeyService,
+        userRoleService,
+        memberService
+      ]
     }).compile()
     resolver = module.get<UserJourneyResolver>(UserJourneyResolver)
     service = await module.resolve(UserJourneyService)
+    mService = module.get<MemberService>(MemberService)
   })
 
   describe('userJourneyRequest', () => {
@@ -113,13 +148,24 @@ describe('UserJourneyResolver', () => {
 
   describe('userJourneyApprove', () => {
     it('updates a UserJourney to editor status', async () => {
-      await resolver
-        .userJourneyApprove(userJourney.id, actorUserJourney.userId)
-        .catch((err) => console.log(err))
+      await resolver.userJourneyApprove(userJourney.id, actorUserJourney.userId)
       expect(service.update).toHaveBeenCalledWith('1', {
         role: UserJourneyRole.editor
       })
     })
+
+    it('adds user to team', async () => {
+      await resolver.userJourneyApprove(userJourney.id, actorUserJourney.userId)
+      expect(mService.save).toHaveBeenCalledWith(
+        {
+          id: '2:jfp-team',
+          userId: '2',
+          teamId: 'jfp-team'
+        },
+        { overwriteMode: 'ignore' }
+      )
+    })
+
     it('should not update a UserJourney to editor status', async () => {
       await resolver
         .userJourneyApprove(userJourney.id, userJourney.userId)
@@ -160,6 +206,16 @@ describe('UserJourneyResolver', () => {
         .userJourneyRemove(actorUserJourney.id, actorUserJourney.userId)
         .catch((err) => console.log(err))
       expect(service.remove).toHaveBeenCalledWith(actorUserJourney.id)
+    })
+  })
+
+  describe('userJourneyRemoveAll', () => {
+    it('removes all userJourneys', async () => {
+      await resolver.userJourneyRemoveAll(journey.id)
+      expect(service.removeAll).toHaveBeenCalledWith([
+        userJourney.id,
+        userJourney.id
+      ])
     })
   })
 })

@@ -24,6 +24,8 @@ const journey: Journey = {
   slug: 'my-journey',
   language: {
     __typename: 'Language',
+    bcp47: 'en',
+    iso3: 'eng',
     id: '529',
     name: [
       {
@@ -40,6 +42,7 @@ const journey: Journey = {
   blocks: [] as TreeBlock[],
   primaryImageBlock: null,
   userJourneys: [],
+  template: null,
   seoTitle: null,
   seoDescription: null
 }

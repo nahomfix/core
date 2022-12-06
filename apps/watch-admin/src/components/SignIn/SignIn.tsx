@@ -1,5 +1,4 @@
 import { ReactElement, useEffect, useState } from 'react'
-import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
 import { getApp } from 'firebase/app'
 import {
   getAuth,
@@ -10,6 +9,7 @@ import {
 import Image from 'next/image'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
+import { StyledFirebaseAuth } from '@core/shared/ui/StyledFirebaseAuth'
 import logo from '../../../public/logo.svg'
 
 export function SignIn(): ReactElement {
@@ -59,7 +59,7 @@ export function SignIn(): ReactElement {
           }}
         >
           <Image src={logo} alt="Next Steps" height={68} width={152} />
-          <Typography variant={'h5'} sx={{ mt: 20, mb: 3 }}>
+          <Typography variant="h5" sx={{ mt: 20, mb: 3 }}>
             Sign In
           </Typography>
           <StyledFirebaseAuth
@@ -67,7 +67,7 @@ export function SignIn(): ReactElement {
             firebaseAuth={getAuth(getApp())}
           />
           <Typography
-            variant={'body2'}
+            variant="body2"
             sx={{ mt: 20, color: 'primary.main', cursor: 'pointer' }}
             component="a"
             href="mailto:support@nextstep.is?Subject=Support%2FFeedback%20Request"

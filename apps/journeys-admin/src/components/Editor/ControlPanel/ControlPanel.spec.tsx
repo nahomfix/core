@@ -69,7 +69,7 @@ describe('ControlPanel', () => {
     ]
   }
 
-  it('should render tabs and tab panels', () => {
+  it('should render tabs and tab panels', async () => {
     const { getByTestId, getByText, getByRole } = render(
       <MockedProvider>
         <JourneyProvider
@@ -77,7 +77,13 @@ describe('ControlPanel', () => {
             journey: {
               id: 'journeyId',
               themeMode: ThemeMode.dark,
-              themeName: ThemeName.base
+              themeName: ThemeName.base,
+              language: {
+                __typename: 'Language',
+                id: '529',
+                bcp47: 'en',
+                iso3: 'eng'
+              }
             } as unknown as Journey,
             admin: true
           }}
@@ -88,9 +94,7 @@ describe('ControlPanel', () => {
         </JourneyProvider>
       </MockedProvider>
     )
-    // Default start on Cards
-    expect(getByRole('tabpanel', { name: 'Cards' })).toBeInTheDocument()
-    fireEvent.click(getByRole('tab', { name: 'Properties' }))
+    // Default start on Properties
     expect(getByRole('tabpanel', { name: 'Properties' })).toBeInTheDocument()
     expect(getByText('Unlocked Card')).toBeInTheDocument()
     fireEvent.click(getByRole('tab', { name: 'Cards' }))
@@ -110,7 +114,13 @@ describe('ControlPanel', () => {
             journey: {
               id: 'journeyId',
               themeMode: ThemeMode.dark,
-              themeName: ThemeName.base
+              themeName: ThemeName.base,
+              language: {
+                __typename: 'Language',
+                id: '529',
+                bcp47: 'en',
+                iso3: 'eng'
+              }
             } as unknown as Journey,
             admin: true
           }}
@@ -135,7 +145,13 @@ describe('ControlPanel', () => {
             journey: {
               id: 'journeyId',
               themeMode: ThemeMode.dark,
-              themeName: ThemeName.base
+              themeName: ThemeName.base,
+              language: {
+                __typename: 'Language',
+                id: '529',
+                bcp47: 'en',
+                iso3: 'eng'
+              }
             } as unknown as Journey,
             admin: true
           }}
@@ -192,7 +208,13 @@ describe('ControlPanel', () => {
             journey: {
               id: 'journeyId',
               themeMode: ThemeMode.dark,
-              themeName: ThemeName.base
+              themeName: ThemeName.base,
+              language: {
+                __typename: 'Language',
+                id: '529',
+                bcp47: 'en',
+                iso3: 'eng'
+              }
             } as unknown as Journey,
             admin: true
           }}
@@ -282,7 +304,13 @@ describe('ControlPanel', () => {
             journey: {
               id: 'journeyId',
               themeMode: ThemeMode.dark,
-              themeName: ThemeName.base
+              themeName: ThemeName.base,
+              language: {
+                __typename: 'Language',
+                id: '529',
+                bcp47: 'en',
+                iso3: 'eng'
+              }
             } as unknown as Journey,
             admin: true
           }}
@@ -435,7 +463,13 @@ describe('ControlPanel', () => {
             journey: {
               id: 'journeyId',
               themeMode: ThemeMode.dark,
-              themeName: ThemeName.base
+              themeName: ThemeName.base,
+              language: {
+                __typename: 'Language',
+                id: '529',
+                bcp47: 'en',
+                iso3: 'eng'
+              }
             } as unknown as Journey,
             admin: true
           }}
@@ -498,7 +532,13 @@ describe('ControlPanel', () => {
             journey: {
               id: 'journeyId',
               themeMode: ThemeMode.dark,
-              themeName: ThemeName.base
+              themeName: ThemeName.base,
+              language: {
+                __typename: 'Language',
+                id: '529',
+                bcp47: 'en',
+                iso3: 'eng'
+              }
             } as unknown as Journey,
             admin: true
           }}
@@ -564,7 +604,13 @@ describe('ControlPanel', () => {
             journey: {
               id: 'journeyId',
               themeMode: ThemeMode.dark,
-              themeName: ThemeName.base
+              themeName: ThemeName.base,
+              language: {
+                __typename: 'Language',
+                id: '529',
+                bcp47: 'en',
+                iso3: 'eng'
+              }
             } as unknown as Journey,
             admin: true
           }}
@@ -672,7 +718,13 @@ describe('ControlPanel', () => {
             journey: {
               id: 'journeyId',
               themeMode: ThemeMode.dark,
-              themeName: ThemeName.base
+              themeName: ThemeName.base,
+              language: {
+                __typename: 'Language',
+                id: '529',
+                bcp47: 'en',
+                iso3: 'eng'
+              }
             } as unknown as Journey,
             admin: true
           }}

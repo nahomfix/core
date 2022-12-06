@@ -17,7 +17,8 @@ import {
   IconSize,
   TypographyVariant,
   ThemeMode,
-  ThemeName
+  ThemeName,
+  VideoBlockSource
 } from '../../../__generated__/globalTypes'
 import { CardPreview } from '.'
 
@@ -527,6 +528,11 @@ const steps: Array<TreeBlock<StepBlock>> = [
             muted: true,
             videoId: '2_0-FallingPlates',
             videoVariantLanguageId: '529',
+            source: VideoBlockSource.internal,
+            title: null,
+            description: null,
+            duration: null,
+            image: null,
             video: {
               __typename: 'Video',
               id: '2_0-FallingPlates',
@@ -549,6 +555,7 @@ const steps: Array<TreeBlock<StepBlock>> = [
             posterBlockId: 'image5.id',
             fullsize: null,
             action: null,
+            objectFit: null,
             children: [
               {
                 id: 'image5.id',
@@ -607,6 +614,11 @@ const steps: Array<TreeBlock<StepBlock>> = [
             muted: true,
             videoId: '2_0-FallingPlates',
             videoVariantLanguageId: '529',
+            source: VideoBlockSource.internal,
+            title: null,
+            description: null,
+            duration: null,
+            image: null,
             video: {
               __typename: 'Video',
               id: '2_0-FallingPlates',
@@ -629,6 +641,7 @@ const steps: Array<TreeBlock<StepBlock>> = [
             posterBlockId: 'image6.id',
             fullsize: null,
             action: null,
+            objectFit: null,
             children: [
               {
                 id: 'image6.id',
@@ -662,7 +675,11 @@ const Template: Story = ({ ...args }) => {
           journey: {
             id: 'journeyId',
             themeMode: ThemeMode.light,
-            themeName: ThemeName.base
+            themeName: ThemeName.base,
+            language: {
+              __typename: 'Language',
+              bcp47: 'en'
+            }
           } as unknown as Journey,
           admin: true
         }}

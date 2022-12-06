@@ -1,3 +1,4 @@
+import { ComponentProps } from 'react'
 import { Story, Meta } from '@storybook/react'
 import { useTheme } from '@mui/material/styles'
 import Box from '@mui/material/Box'
@@ -10,40 +11,17 @@ import {
   ButtonColor,
   ButtonSize,
   IconName,
-  IconSize
+  IconSize,
+  VideoBlockSource
 } from '../../../__generated__/globalTypes'
 import { ImageFields } from '../Image/__generated__/ImageFields'
 import { VideoFields } from '../Video/__generated__/VideoFields'
-import { CardFields } from './__generated__/CardFields'
 import { Card } from './Card'
 
 const Demo = {
   ...journeyUiConfig,
   component: Card,
   title: 'Journeys-Ui/Card'
-}
-
-const Template: Story<TreeBlock<CardFields>> = ({ ...props }) => {
-  const theme = useTheme()
-  return (
-    <MockedProvider>
-      <Box
-        sx={{
-          height: 'calc(100vh - 80px)',
-          maxHeight: 'calc(100vh - 80px)',
-          [theme.breakpoints.up('sm')]: {
-            maxHeight: '460px'
-          },
-          [theme.breakpoints.up('lg')]: {
-            maxWidth: '854px',
-            maxHeight: '480px'
-          }
-        }}
-      >
-        <Card {...props} />
-      </Box>
-    </MockedProvider>
-  )
 }
 
 const content: TreeBlock[] = [
@@ -122,6 +100,12 @@ const video: TreeBlock<VideoFields> = {
   posterBlockId: null,
   videoId: '2_0-FallingPlates',
   videoVariantLanguageId: '529',
+  source: VideoBlockSource.internal,
+  title: null,
+  description: null,
+  duration: null,
+  image: null,
+  objectFit: null,
   video: {
     __typename: 'Video',
     id: '2_0-FallingPlates',
@@ -144,8 +128,31 @@ const video: TreeBlock<VideoFields> = {
   children: []
 }
 
+const Template: Story<ComponentProps<typeof Card>> = ({ ...args }) => {
+  const theme = useTheme()
+  return (
+    <MockedProvider>
+      <Box
+        sx={{
+          height: 'calc(100vh - 80px)',
+          maxHeight: 'calc(100vh - 80px)',
+          [theme.breakpoints.up('sm')]: {
+            maxHeight: '460px'
+          },
+          [theme.breakpoints.up('lg')]: {
+            maxWidth: '854px',
+            maxHeight: '480px'
+          }
+        }}
+      >
+        <Card {...args} />
+      </Box>
+    </MockedProvider>
+  )
+}
+
 // Expanded - default content background
-export const Default: Story<TreeBlock<CardFields>> = Template.bind({})
+export const Default = Template.bind({})
 Default.args = {
   themeMode: null,
   themeName: null,
@@ -153,45 +160,65 @@ Default.args = {
 }
 
 // Expanded - override content background
-export const Custom: Story<TreeBlock<CardFields>> = Template.bind({})
+export const Custom = Template.bind({})
 Custom.args = {
-  backgroundColor: '#F1A025',
-  children: content
+  ...Default.args,
+  backgroundColor: '#F1A025'
 }
 
 // Expanded - blur image content background
-export const ImageBlur: Story<TreeBlock<CardFields>> = Template.bind({})
+export const ImageBlur = Template.bind({})
 ImageBlur.args = {
+  ...Default.args,
   coverBlockId: image.id,
   children: [...content, image],
   fullscreen: true
 }
 
+// RTL Expanded - blur image content background
+export const RTLImageBlur = Template.bind({})
+RTLImageBlur.args = { ...ImageBlur.args }
+RTLImageBlur.parameters = { rtl: true }
+
 // Contained - cover image background with blur image content background
-export const ImageCover: Story<TreeBlock<CardFields>> = Template.bind({})
+export const ImageCover = Template.bind({})
 ImageCover.args = {
+  ...Default.args,
   coverBlockId: image.id,
   children: [...content, image]
 }
+ImageCover.parameters = {
+  chromatic: { viewports: [360, 599, 1200] }
+}
 
+// RTL Expanded - blur image content background
+export const RTLImageCover = Template.bind({})
+RTLImageCover.args = { ...ImageCover.args }
+RTLImageCover.parameters = {
+  rtl: true,
+  chromatic: { viewports: [360, 599, 1200] }
+}
 // Contained - cover video background with default content background
-export const VideoCoverDefault: Story<TreeBlock<CardFields>> = Template.bind({})
+export const VideoCoverDefault = Template.bind({})
 VideoCoverDefault.args = {
+  ...Default.args,
   coverBlockId: video.id,
   children: [...content, video]
 }
 
 // Contained - cover video background with override content background
-export const VideoCoverCustom: Story<TreeBlock<CardFields>> = Template.bind({})
+export const VideoCoverCustom = Template.bind({})
 VideoCoverCustom.args = {
+  ...Default.args,
   backgroundColor: '#F1A025',
   coverBlockId: video.id,
   children: [...content, video]
 }
 
 // Contained - cover video background with blur poster image content background
-export const VideoCoverPoster: Story<TreeBlock<CardFields>> = Template.bind({})
+export const VideoCoverPoster = Template.bind({})
 VideoCoverPoster.args = {
+  ...Default.args,
   coverBlockId: video.id,
   children: [
     ...content,
@@ -203,9 +230,27 @@ VideoCoverPoster.args = {
   ]
 }
 
+// Contained - youtube
+export const VideoYoutubeDefault = Template.bind({})
+VideoYoutubeDefault.args = {
+  ...Default.args,
+  coverBlockId: video.id,
+  children: [
+    ...content,
+    {
+      ...video,
+      video: null,
+      videoId: '5I69DCxYbBg',
+      source: VideoBlockSource.youTube,
+      startAt: 2738
+    }
+  ]
+}
+
 // Expanded - child video block displays fullscreen simulating video only card
-export const VideoContent: Story<TreeBlock<CardFields>> = Template.bind({})
+export const VideoContent = Template.bind({})
 VideoContent.args = {
+  ...Default.args,
   children: [{ ...video, autoplay: false, parentOrder: 0 }]
 }
 

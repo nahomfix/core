@@ -5,8 +5,10 @@ import { ThemeProvider } from '@core/shared/ui/ThemeProvider'
 import { transformer } from '@core/journeys/ui/transformer'
 import { JOURNEY_FIELDS } from '@core/journeys/ui/JourneyProvider/journeyFields'
 import { JourneyProvider } from '@core/journeys/ui/JourneyProvider'
+import { getJourneyRTL } from '@core/journeys/ui/rtl'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { NextSeo } from 'next-seo'
+import { useRouter } from 'next/router'
 import { Conductor } from '../src/components/Conductor'
 import { createApolloClient } from '../src/libs/apolloClient'
 import {
@@ -21,6 +23,12 @@ interface JourneyPageProps {
 }
 
 function JourneyPage({ journey }: JourneyPageProps): ReactElement {
+  const router = useRouter()
+  const { rtl, locale } = getJourneyRTL(journey)
+  const isIframe = typeof window !== 'undefined' && window.self !== window.top
+  if (isIframe) {
+    void router.push('/embed/[journeySlug]', `/embed/${journey.slug}`)
+  }
   return (
     <>
       <NextSeo
@@ -63,6 +71,8 @@ function JourneyPage({ journey }: JourneyPageProps): ReactElement {
         <ThemeProvider
           themeName={journey.themeName}
           themeMode={journey.themeMode}
+          rtl={rtl}
+          locale={locale}
         >
           {journey.blocks != null && (
             <Conductor blocks={transformer(journey.blocks)} />
@@ -73,19 +83,21 @@ function JourneyPage({ journey }: JourneyPageProps): ReactElement {
   )
 }
 
+export const GET_JOURNEY = gql`
+  ${JOURNEY_FIELDS}
+  query GetJourney($id: ID!) {
+    journey(id: $id, idType: slug) {
+      ...JourneyFields
+    }
+  }
+`
+
 export const getStaticProps: GetStaticProps<JourneyPageProps> = async (
   context
 ) => {
   const apolloClient = createApolloClient()
   const { data } = await apolloClient.query<GetJourney>({
-    query: gql`
-      ${JOURNEY_FIELDS}
-      query GetJourney($id: ID!) {
-        journey(id: $id, idType: slug) {
-          ...JourneyFields
-        }
-      }
-    `,
+    query: GET_JOURNEY,
     variables: {
       id: context.params?.journeySlug
     }
@@ -118,16 +130,18 @@ export const getStaticProps: GetStaticProps<JourneyPageProps> = async (
   }
 }
 
+export const GET_JOURNEY_SLUGS = gql`
+  query GetJourneySlugs {
+    journeys {
+      slug
+    }
+  }
+`
+
 export const getStaticPaths: GetStaticPaths = async () => {
   const apolloClient = createApolloClient()
   const { data } = await apolloClient.query<GetJourneySlugs>({
-    query: gql`
-      query GetJourneySlugs {
-        journeys {
-          slug
-        }
-      }
-    `
+    query: GET_JOURNEY_SLUGS
   })
 
   const paths = data.journeys.map(({ slug: journeySlug }) => ({

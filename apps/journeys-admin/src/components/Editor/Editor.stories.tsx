@@ -11,7 +11,8 @@ import {
   JourneyStatus,
   ThemeMode,
   ThemeName,
-  TypographyVariant
+  TypographyVariant,
+  VideoBlockSource
 } from '../../../__generated__/globalTypes'
 import { GetJourney_journey_blocks } from '../../../__generated__/GetJourney'
 import { PageWrapper } from '../PageWrapper'
@@ -109,6 +110,12 @@ const blocks: GetJourney_journey_blocks[] = [
     muted: true,
     videoId: '2_0-FallingPlates',
     videoVariantLanguageId: '529',
+    source: VideoBlockSource.internal,
+    title: null,
+    description: null,
+    duration: null,
+    image: null,
+    objectFit: null,
     video: {
       __typename: 'Video',
       id: '2_0-FallingPlates',
@@ -409,6 +416,12 @@ const blocks: GetJourney_journey_blocks[] = [
     muted: true,
     videoId: '2_0-FallingPlates',
     videoVariantLanguageId: '529',
+    source: VideoBlockSource.internal,
+    title: null,
+    description: null,
+    duration: null,
+    image: null,
+    objectFit: null,
     video: {
       __typename: 'Video',
       id: '2_0-FallingPlates',
@@ -608,7 +621,19 @@ Default.args = {
     title: 'NUA Journey: Ep.3 – Decision',
     slug: 'nua-journey-ep-3-decision',
     description: 'my cool journey',
-    languageId: '529',
+    language: {
+      __typename: 'Language',
+      id: '529',
+      bcp47: 'en',
+      iso3: 'eng',
+      name: [
+        {
+          __typename: 'Translation',
+          value: 'English',
+          primary: true
+        }
+      ]
+    },
     status: JourneyStatus.draft,
     createdAt: '2021-11-19T12:34:56.647Z',
     publishedAt: null,
@@ -621,6 +646,37 @@ Default.args = {
 export const Loading = Template.bind({})
 Loading.args = {
   journey: undefined
+}
+
+export const RTL = Template.bind({})
+RTL.args = {
+  journey: {
+    __typename: 'Journey',
+    id: 'journeyId',
+    themeName: ThemeName.base,
+    themeMode: ThemeMode.light,
+    title: 'NUA Journey: Ep.3 – Decision',
+    slug: 'nua-journey-ep-3-decision',
+    description: 'my cool journey',
+    language: {
+      __typename: 'Language',
+      id: '529',
+      bcp47: 'ar',
+      name: [
+        {
+          __typename: 'Translation',
+          value: 'Arabic',
+          primary: true
+        }
+      ]
+    },
+    status: JourneyStatus.draft,
+    createdAt: '2021-11-19T12:34:56.647Z',
+    publishedAt: null,
+    primaryImageBlock: null,
+    userJourneys: [],
+    blocks
+  }
 }
 
 export default EditorStory as Meta

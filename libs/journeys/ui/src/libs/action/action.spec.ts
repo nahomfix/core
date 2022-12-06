@@ -31,18 +31,36 @@ describe('action', () => {
       expect(nextActiveBlock).toHaveBeenCalledWith({ id: 'block-id' })
     })
 
-    it('should handle NavigateToJourneyAction', () => {
+    it('should navigate to journey with same RTL on NavigateToJourneyAction', () => {
       handleAction(router, {
         __typename: 'NavigateToJourneyAction',
         parentBlockId: 'parent-id',
         journey: {
           __typename: 'Journey',
           id: 'journey-id',
-          slug: 'journey-slug'
+          slug: 'journey-slug',
+          language: { __typename: 'Language', bcp47: 'en' }
         },
         gtmEventName: null
       })
       expect(router.push).toHaveBeenCalledWith('/journey-slug')
+    })
+
+    it('should navigate on journey with different RTL on NavigateToJourneyAction', () => {
+      window.open = jest.fn()
+
+      handleAction(router, {
+        __typename: 'NavigateToJourneyAction',
+        parentBlockId: 'parent-id',
+        journey: {
+          __typename: 'Journey',
+          id: 'journey-id',
+          slug: 'journey-slug',
+          language: { __typename: 'Language', bcp47: 'ar' }
+        },
+        gtmEventName: null
+      })
+      expect(window.open).toHaveBeenCalledWith('/journey-slug', '_self')
     })
 
     it('should handle NavigateToJourneyAction when journey is null', () => {
@@ -65,14 +83,29 @@ describe('action', () => {
       expect(nextActiveBlock).toHaveBeenCalledWith()
     })
 
-    it('should handle LinkAction', () => {
+    it('should handle external LinkAction', () => {
+      window.open = jest.fn()
+
       handleAction(router, {
         __typename: 'LinkAction',
         parentBlockId: 'parent-id',
         gtmEventName: null,
         url: 'http://www.google.com'
       })
-      expect(router.push).toHaveBeenCalledWith('http://www.google.com')
+      expect(window.open).toHaveBeenCalledWith(
+        'http://www.google.com',
+        '_blank'
+      )
+    })
+
+    it('should handle internal LinkAction', () => {
+      handleAction(router, {
+        __typename: 'LinkAction',
+        parentBlockId: 'parent-id',
+        gtmEventName: null,
+        url: 'fact-or-fiction'
+      })
+      expect(router.push).toHaveBeenCalledWith('fact-or-fiction')
     })
   })
 })

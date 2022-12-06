@@ -140,7 +140,45 @@ describe('EditToolbar Menu', () => {
       fireEvent.click(getByRole('button'))
       expect(
         getByRole('menuitem', { name: 'Journey Settings' })
-      ).toHaveAttribute('href', '/journeys/my-journey')
+      ).toHaveAttribute('href', '/journeys/journeyId')
+    })
+
+    it('should link back to publisher page on click', () => {
+      const selectedBlock: TreeBlock<StepBlock> = {
+        __typename: 'StepBlock',
+        id: 'stepId',
+        parentBlockId: 'journeyId',
+        parentOrder: 0,
+        locked: true,
+        nextBlockId: null,
+        children: []
+      }
+
+      const { getByRole } = render(
+        <SnackbarProvider>
+          <MockedProvider>
+            <JourneyProvider
+              value={{
+                journey: {
+                  id: 'journeyId',
+                  slug: 'my-journey',
+                  template: true
+                } as unknown as Journey,
+                admin: true
+              }}
+            >
+              <EditorProvider initialState={{ selectedBlock }}>
+                <Menu />
+              </EditorProvider>
+            </JourneyProvider>
+          </MockedProvider>
+        </SnackbarProvider>
+      )
+
+      fireEvent.click(getByRole('button'))
+      expect(
+        getByRole('menuitem', { name: 'Publisher Settings' })
+      ).toHaveAttribute('href', '/publisher/journeyId')
     })
   })
 

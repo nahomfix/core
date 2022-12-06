@@ -37,6 +37,8 @@ const journey: Journey = {
   language: {
     __typename: 'Language',
     id: '529',
+    bcp47: 'en',
+    iso3: 'eng',
     name: [
       {
         __typename: 'Translation',
@@ -52,6 +54,7 @@ const journey: Journey = {
   blocks: [] as TreeBlock[],
   primaryImageBlock: null,
   userJourneys: [],
+  template: null,
   seoTitle: null,
   seoDescription: null
 }

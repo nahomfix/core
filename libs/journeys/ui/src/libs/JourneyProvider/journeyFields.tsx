@@ -13,6 +13,8 @@ export const JOURNEY_FIELDS = gql`
     status
     language {
       id
+      bcp47
+      iso3
       name {
         value
         primary
@@ -24,6 +26,7 @@ export const JOURNEY_FIELDS = gql`
     themeMode
     seoTitle
     seoDescription
+    template
     blocks {
       ...BlockFields
     }
@@ -32,6 +35,7 @@ export const JOURNEY_FIELDS = gql`
     }
     userJourneys {
       id
+      role
       user {
         id
         firstName

@@ -9,7 +9,8 @@ import {
 import {
   JourneyStatus,
   ThemeMode,
-  ThemeName
+  ThemeName,
+  VideoBlockSource
 } from '../../../__generated__/globalTypes'
 import { blockDeleteUpdate } from './blockDeleteUpdate'
 
@@ -26,6 +27,12 @@ const video: TreeBlock<VideoBlock> = {
   action: null,
   videoId: '2_0-FallingPlates',
   videoVariantLanguageId: '529',
+  source: VideoBlockSource.internal,
+  title: null,
+  description: null,
+  duration: null,
+  image: null,
+  objectFit: null,
   video: {
     __typename: 'Video',
     id: '2_0-FallingPlates',
@@ -70,6 +77,8 @@ const journey: Journey = {
   language: {
     __typename: 'Language',
     id: '529',
+    bcp47: 'en',
+    iso3: 'eng',
     name: [
       {
         __typename: 'Translation',
@@ -84,6 +93,7 @@ const journey: Journey = {
   publishedAt: null,
   blocks: [],
   primaryImageBlock: null,
+  template: null,
   userJourneys: [],
   seoTitle: null,
   seoDescription: null

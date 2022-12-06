@@ -13,17 +13,21 @@ import { AuthenticationError, UserInputError } from 'apollo-server-errors'
 import {
   IdType,
   Journey,
+  Role,
   UserJourney,
   UserJourneyRole
 } from '../../__generated__/graphql'
 import { JourneyService } from '../journey/journey.service'
+import { RoleGuard } from '../../lib/roleGuard/roleGuard'
+import { MemberService } from '../member/member.service'
 import { UserJourneyService } from './userJourney.service'
 
 @Resolver('UserJourney')
 export class UserJourneyResolver {
   constructor(
     private readonly userJourneyService: UserJourneyService,
-    private readonly journeyService: JourneyService
+    private readonly journeyService: JourneyService,
+    private readonly memberService: MemberService
   ) {}
 
   @Query()
@@ -81,6 +85,20 @@ export class UserJourneyResolver {
   ): Promise<UserJourney> {
     const userJourney: UserJourney = await this.getUserJourney(id)
     await this.checkOwnership(userJourney.journeyId, userId)
+
+    const journey = await this.journeyService.get<{ teamId: string }>(
+      userJourney.journeyId
+    )
+
+    await this.memberService.save(
+      {
+        id: `${userId}:${journey.teamId}`,
+        userId,
+        teamId: journey.teamId
+      },
+      { overwriteMode: 'ignore' }
+    )
+
     return await this.userJourneyService.update(id, {
       role: UserJourneyRole.editor
     })
@@ -119,6 +137,19 @@ export class UserJourneyResolver {
     const userJourney: UserJourney = await this.getUserJourney(id)
     await this.checkOwnership(userJourney.journeyId, userId)
     return await this.userJourneyService.remove(id)
+  }
+
+  @Mutation()
+  @UseGuards(
+    GqlAuthGuard,
+    RoleGuard('id', { role: Role.publisher, attributes: { template: true } })
+  )
+  async userJourneyRemoveAll(@Args('id') id: string): Promise<UserJourney[]> {
+    const journey: Journey = await this.journeyService.get(id)
+    const userJourneys = await this.userJourneyService.forJourney(journey)
+    const userJourneyIds: string[] = userJourneys.map((user) => user.id)
+
+    return await this.userJourneyService.removeAll(userJourneyIds)
   }
 
   @ResolveField()

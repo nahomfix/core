@@ -5,9 +5,9 @@ import type { TreeBlock } from '@core/journeys/ui/block'
 import { fireEvent, render, waitFor } from '@testing-library/react'
 import { SnackbarProvider } from 'notistack'
 import { InMemoryCache } from '@apollo/client'
-import { GET_VIDEOS } from '../../../../../VideoLibrary/VideoList/VideoList'
-import { GET_VIDEO } from '../../../../../VideoLibrary/VideoDetails/VideoDetails'
-import { videos } from '../../../../../VideoLibrary/VideoList/VideoListData'
+import { GET_VIDEOS } from '../../../../../VideoLibrary/VideoFromLocal/VideoFromLocal'
+import { GET_VIDEO } from '../../../../../VideoLibrary/VideoFromLocal/LocalDetails/LocalDetails'
+import { videos } from '../../../../../VideoLibrary/VideoFromLocal/data'
 import {
   GetJourney_journey as Journey,
   GetJourney_journey_blocks_VideoBlock as VideoBlock,
@@ -15,7 +15,8 @@ import {
 } from '../../../../../../../../__generated__/GetJourney'
 import {
   ThemeMode,
-  ThemeName
+  ThemeName,
+  VideoBlockSource
 } from '../../../../../../../../__generated__/globalTypes'
 import { ThemeProvider } from '../../../../../../ThemeProvider'
 import {
@@ -37,6 +38,12 @@ const video: TreeBlock<VideoBlock> = {
   action: null,
   videoId: '2_0-FallingPlates',
   videoVariantLanguageId: '529',
+  source: VideoBlockSource.internal,
+  title: null,
+  description: null,
+  duration: null,
+  image: null,
+  objectFit: null,
   video: {
     __typename: 'Video',
     id: '2_0-FallingPlates',
@@ -136,6 +143,7 @@ describe('VideoOptions', () => {
                 input: {
                   videoId: '2_0-Brand_Video',
                   videoVariantLanguageId: '529',
+                  source: VideoBlockSource.internal,
                   startAt: 0,
                   endAt: 144
                 }
@@ -154,7 +162,7 @@ describe('VideoOptions', () => {
           <ThemeProvider>
             <EditorProvider
               initialState={{
-                selectedBlock: video
+                selectedBlock: { ...video, videoId: null }
               }}
             >
               <SnackbarProvider>
@@ -165,7 +173,6 @@ describe('VideoOptions', () => {
         </JourneyProvider>
       </MockedProvider>
     )
-    fireEvent.click(getByRole('button', { name: 'Select a Video' }))
     await waitFor(() => expect(getByText('Brand Video')).toBeInTheDocument())
     fireEvent.click(getByText('Brand Video'))
     await waitFor(() =>
@@ -235,6 +242,7 @@ describe('VideoOptions', () => {
                 input: {
                   videoId: '2_0-Brand_Video',
                   videoVariantLanguageId: '529',
+                  source: VideoBlockSource.internal,
                   startAt: 0,
                   endAt: 144
                 }
@@ -274,7 +282,10 @@ describe('VideoOptions', () => {
         >
           <ThemeProvider>
             <EditorProvider
-              initialState={{ selectedStep, selectedBlock: video }}
+              initialState={{
+                selectedStep,
+                selectedBlock: { ...video, videoId: null }
+              }}
             >
               <SnackbarProvider>
                 <VideoOptions />
@@ -284,7 +295,6 @@ describe('VideoOptions', () => {
         </JourneyProvider>
       </MockedProvider>
     )
-    fireEvent.click(getByRole('button', { name: 'Select a Video' }))
     await waitFor(() => expect(getByText('Brand Video')).toBeInTheDocument())
     fireEvent.click(getByText('Brand Video'))
     await waitFor(() =>

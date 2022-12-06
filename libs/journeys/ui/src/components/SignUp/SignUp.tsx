@@ -16,11 +16,11 @@ import { useEditor } from '../../libs/EditorProvider'
 import { useJourney } from '../../libs/JourneyProvider'
 import { handleAction } from '../../libs/action'
 import { getStepHeading } from '../../libs/getStepHeading'
+import { TextField } from '../TextField'
 import { Icon } from '../Icon'
 import { IconFields } from '../Icon/__generated__/IconFields'
 import { SignUpSubmissionEventCreate } from './__generated__/SignUpSubmissionEventCreate'
 import { SignUpFields } from './__generated__/SignUpFields'
-import { TextField } from './TextField'
 
 export const SIGN_UP_SUBMISSION_EVENT_CREATE = gql`
   mutation SignUpSubmissionEventCreate(
@@ -28,8 +28,6 @@ export const SIGN_UP_SUBMISSION_EVENT_CREATE = gql`
   ) {
     signUpSubmissionEventCreate(input: $input) {
       id
-      name
-      email
     }
   }
 `
@@ -95,6 +93,7 @@ export const SignUp = ({
             input: {
               id,
               blockId,
+              stepId: activeBlock?.id,
               name: values.name,
               email: values.email
             }
