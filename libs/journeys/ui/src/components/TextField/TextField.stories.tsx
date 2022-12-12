@@ -1,6 +1,5 @@
-import { ComponentProps } from 'react'
 import Stack from '@mui/material/Stack'
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta, ComponentStory } from '@storybook/react'
 import { Form, Formik } from 'formik'
 import { object, string } from 'yup'
 import { journeyUiConfig } from '../../libs/journeyUiConfig'
@@ -8,14 +7,14 @@ import { simpleComponentConfig } from '../../libs/simpleComponentConfig'
 import { StoryCard } from '../StoryCard'
 import { TextField } from './TextField'
 
-const Demo = {
+const Demo: ComponentMeta<typeof TextField> = {
   ...journeyUiConfig,
   ...simpleComponentConfig,
   component: TextField,
   title: 'Journeys-Ui/TextField'
 }
 
-const Template: Story<ComponentProps<typeof TextField>> = () => (
+const Template: ComponentStory<typeof TextField> = (args) => (
   <StoryCard>
     <Formik
       initialValues={{
@@ -51,10 +50,15 @@ const Template: Story<ComponentProps<typeof TextField>> = () => (
               placeholder="Placeholder"
               focused
             />
-            <TextField name="prepopulated" label="Prepopulated" />
-            <TextField name="hint" label="Hint" helperText="Hint Text" />
-            <TextField name="error" label="Error" />
-            <TextField name="disabled" label="Disabled" disabled />
+            <TextField name="prepopulated" label="Prepopulated" {...args} />
+            <TextField
+              name="hint"
+              label="Hint"
+              helperText="Hint Text"
+              {...args}
+            />
+            <TextField name="error" label="Error" {...args} />
+            <TextField name="disabled" label="Disabled" disabled {...args} />
           </Stack>
         </Form>
       )}
@@ -62,7 +66,7 @@ const Template: Story<ComponentProps<typeof TextField>> = () => (
   </StoryCard>
 )
 
-const TextareaTemplate: Story<ComponentProps<typeof TextField>> = () => {
+const TextareaTemplate: ComponentStory<typeof TextField> = (args) => {
   // Hack to create multiple components in 1 story. Only done for journey-ui
   const fields = [
     {
@@ -98,7 +102,12 @@ const TextareaTemplate: Story<ComponentProps<typeof TextField>> = () => {
             >
               {() => (
                 <Form>
-                  <TextField multiline name={field.name} label={field.label} />
+                  <TextField
+                    multiline
+                    name={field.name}
+                    label={field.label}
+                    {...args}
+                  />
                 </Form>
               )}
             </Formik>
@@ -117,7 +126,6 @@ export const RTL = Template.bind({})
 RTL.parameters = { rtl: true }
 
 export const Urdu = Template.bind({})
-Urdu.args = { ...RTL.args }
 Urdu.parameters = {
   rtl: true,
   locale: 'ur',
@@ -132,4 +140,4 @@ Urdu.parameters = {
 
 // export const Select = Template.bind({})
 
-export default Demo as Meta
+export default Demo

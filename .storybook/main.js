@@ -61,7 +61,24 @@ module.exports = {
   },
   resolve: {
     fallback: {
-      util: require.resolve('util/')
+      util: require.resolve('util/'),
+      assert: require.resolve('assert')
+    }
+  },
+  framework: '@storybook/react',
+  typescript: {
+    check: false,
+    checkOptions: {},
+    reactDocgen: 'react-docgen-typescript',
+    reactDocgenTypescriptOptions: {
+      allowSyntheticDefaultImports: false,
+      esModuleInterop: false,
+      shouldExtractLiteralValuesFromEnum: true,
+      shouldRemoveUndefinedFromOptional: true,
+      propFilter: (prop) =>
+        prop.parent
+          ? !/node_modules\/(?!@mui)/.test(prop.parent.fileName)
+          : true
     }
   },
   webpackFinal: async (config) => {

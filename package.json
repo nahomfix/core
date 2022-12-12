@@ -179,6 +179,7 @@
     "@typescript-eslint/parser": "4.33.0",
     "@vidavidorra/commitlint-config": "^4.0.4",
     "apollo": "^2.33.9",
+    "assert": "^2.0.0",
     "babel-jest": "27.2.3",
     "babel-loader": "8.1.0",
     "chromatic": "^6.11.4",
