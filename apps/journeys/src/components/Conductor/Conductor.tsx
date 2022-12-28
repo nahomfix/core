@@ -240,7 +240,7 @@ export function Conductor({ blocks }: ConductorProps): ReactElement {
                 >
                   <CardWrapper
                     id={block.id}
-                    backgroundColor={theme.palette.primary.light}
+                    backgroundColor={null}
                     themeMode={null}
                     themeName={null}
                   >
