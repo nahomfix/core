@@ -14,7 +14,7 @@ interface VideosCarouselProps {
   renderItem: (props: unknown) => ReactNode
 }
 
-SwiperCore.use([Navigation, A11y])
+// SwiperCore.use([Navigation, A11y])
 
 // Remove when we can update to latest swiper version
 type SwiperExtended = SwiperCore & {
@@ -127,6 +127,7 @@ export function VideosCarousel({
   return (
     <Box data-testid="videos-carousel">
       <Swiper
+        modules={[Navigation, A11y]}
         // TODO: Use wrapperClass after updating Swiper version. Currently not supported for swiper/react
         className="jfp-watch"
         {...mobileSlideConfig}

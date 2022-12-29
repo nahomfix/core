@@ -8,7 +8,8 @@ import { CacheProvider } from '@emotion/react'
 import type { EmotionCache } from '@emotion/cache'
 import { createEmotionCache } from '@core/shared/ui/createEmotionCache'
 
-import 'swiper/swiper.min.css'
+import 'swiper/css'
+import 'swiper/css/navigation';
 import '../public/fonts/fonts.css'
 import '../public/styles/swiper-js.css'
 
