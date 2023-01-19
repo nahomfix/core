@@ -18,7 +18,7 @@ export function VisitorList({ edges }: Props): ReactElement {
         <TableHead>
           <TableRow>
             <TableCell>ID</TableCell>
-            <TableCell align="right">Created At</TableCell>
+            <TableCell align="left">Created At</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -27,7 +27,7 @@ export function VisitorList({ edges }: Props): ReactElement {
               <TableCell component="th" scope="row">
                 {row.node.id}
               </TableCell>
-              <TableCell align="right">{row.node.id}</TableCell>
+              <TableCell align="left">{row.node.createdAt}</TableCell>
             </TableRow>
           ))}
         </TableBody>

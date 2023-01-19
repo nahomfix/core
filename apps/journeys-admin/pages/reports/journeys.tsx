@@ -51,7 +51,7 @@ function ReportsJourneysPage(): ReactElement {
       >
         <Box sx={{ height: 'calc(100vh - 48px)' }}>
           {/* <MemoizedDynamicReport reportType={JourneysReportType.multipleFull} /> */}
-          <VisitorList data={data.edges} />
+          {data != null ? <VisitorList {...{ edges: data.edges }} /> : <></>}
         </Box>
       </PageWrapper>
     </>
