@@ -28,7 +28,6 @@ type ArclightVideo
   label: ArclightVideoLabel!
   primaryLanguageId: ID!
   title(languageId: ID, primary: Boolean): [Translation!]!
-  seoTitle(languageId: ID, primary: Boolean): [Translation!]!
   snippet(languageId: ID, primary: Boolean): [Translation!]!
   description(languageId: ID, primary: Boolean): [Translation!]!
   studyQuestions(languageId: ID, primary: Boolean): [Translation!]!
@@ -40,7 +39,6 @@ type ArclightVideo
   slug is a permanent link to the arclightVideo.
   """
   slug: String!
-  noIndex: Boolean
   children: [ArclightVideo!]!
   """
   the number value of the amount of children on a arclightVideo

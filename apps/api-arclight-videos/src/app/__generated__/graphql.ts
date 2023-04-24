@@ -55,7 +55,6 @@ export class ArclightVariant {
     duration: number;
     language: Language;
     subtitle: Translation[];
-    subtitleCount: number;
     slug: string;
 }
 
@@ -66,7 +65,6 @@ export class ArclightVideo {
     label: ArclightVideoLabel;
     primaryLanguageId: string;
     title: Translation[];
-    seoTitle: Translation[];
     snippet: Translation[];
     description: Translation[];
     studyQuestions: Translation[];
@@ -75,7 +73,6 @@ export class ArclightVideo {
     variantLanguages: Language[];
     variantLanguagesCount: number;
     slug: string;
-    noIndex?: Nullable<boolean>;
     children: ArclightVideo[];
     childrenCount: number;
     variantLanguagesWithSlug: LanguageWithSlug[];

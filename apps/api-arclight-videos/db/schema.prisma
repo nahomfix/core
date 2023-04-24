@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = env("PRISMA_LOCATION")
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("PG_DATABASE_URL")
+}
+
+model Video {
+  id                   String          @id
+  label                String
+  primaryLanguageId    String
+  image                String?
+  slug                 String          @unique
+  title                Content         @relation("titleOnVideo", fields: [titleContentId], references: [id])
+  titleContentId       String          @db.Uuid
+  snippet              Content?        @relation("snippetOnVideo", fields: [snippetContentId], references: [id])
+  snippetContentId     String?         @db.Uuid
+  description          Content?        @relation("descriptionOnVideo", fields: [descriptionContentId], references: [id])
+  descriptionContentId String?         @db.Uuid
+  imageAlt             Content?        @relation("imageAltOnVideo", fields: [imageAltContentId], references: [id])
+  imageAltContentId    String?         @db.Uuid
+  variantCount         Int
+  childrenCount        Int
+  children             Children[]      @relation("parent")
+  studyQuestions       StudyQuestion[]
+  variants             Variant[]
+  parents              Children[]      @relation("child")
+}
+
+model Children {
+  parent   Video  @relation("parent", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId String
+  child    Video  @relation("child", fields: [childId], references: [id], onDelete: Cascade)
+  childId  String
+
+  @@unique([parentId, childId])
+}
+
+model StudyQuestion {
+  id        String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  content   Content @relation(fields: [contentId], references: [id])
+  contentId String  @db.Uuid
+  video     Video   @relation(fields: [videoId], references: [id])
+  videoId   String
+}
+
+model Variant {
+  id                String     @id
+  hls               String?
+  languageId        String
+  duration          Int
+  slug              String     @unique
+  video             Video      @relation(fields: [videoId], references: [id])
+  videoId           String
+  subtitle          Content?   @relation("subtitleOnVariant", fields: [subtitleContentId], references: [id])
+  subtitleContentId String?    @db.Uuid
+  downloads         Download[]
+}
+
+model Download {
+  id        String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  variant   Variant @relation(fields: [variantId], references: [id])
+  variantId String
+  quality   String
+  size      Int
+  url       String
+}
+
+model Content {
+  id                 String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  text               String
+  languageId         String
+  subtitleOnVariant  Variant[]       @relation("subtitleOnVariant")
+  translations       Translation[]
+  studyQuestions     StudyQuestion[]
+  titleOnVideo       Video[]         @relation("titleOnVideo")
+  snippetOnVideo     Video[]         @relation("snippetOnVideo")
+  descriptionOnVideo Video[]         @relation("descriptionOnVideo")
+  imageAltOnVideo    Video[]         @relation("imageAltOnVideo")
+}
+
+model Translation {
+  id         String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  content    Content @relation(fields: [contentId], references: [id])
+  contentId  String  @db.Uuid
+  languageId String
+  text       String
+}
