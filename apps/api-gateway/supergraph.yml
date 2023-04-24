@@ -1,5 +1,9 @@
 federation_version: 2
 subgraphs:
+  arclight-videos:
+    routing_url: http://127.0.0.1:4007/graphql
+    schema:
+      file: ../api-arclight-videos/schema.graphql
   journeys:
     routing_url: http://127.0.0.1:4001/graphql
     schema:

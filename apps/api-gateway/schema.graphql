@@ -27,6 +27,84 @@ interface Action
   gtmEventName: String
 }
 
+type ArclightVariant
+  @join__type(graph: ARCLIGHT_VIDEOS)
+{
+  id: String!
+  hls: String
+  downloads: [ArclightVariantDownload!]!
+  duration: Int!
+  language: Language!
+  subtitle(languageId: ID, primary: Boolean): [Translation!]!
+  subtitleCount: Int!
+
+  """slug is a permanent link to the video variant."""
+  slug: String!
+}
+
+type ArclightVariantDownload
+  @join__type(graph: ARCLIGHT_VIDEOS)
+{
+  quality: ArclightVariantDownloadQuality!
+  size: Float!
+  url: String!
+}
+
+enum ArclightVariantDownloadQuality
+  @join__type(graph: ARCLIGHT_VIDEOS)
+{
+  low @join__enumValue(graph: ARCLIGHT_VIDEOS)
+  high @join__enumValue(graph: ARCLIGHT_VIDEOS)
+}
+
+type ArclightVideo
+  @join__type(graph: ARCLIGHT_VIDEOS, key: "id primaryLanguageId")
+{
+  variant(languageId: ID): ArclightVariant
+  id: ID!
+  label: ArclightVideoLabel!
+  primaryLanguageId: ID!
+  title(languageId: ID, primary: Boolean): [Translation!]!
+  seoTitle(languageId: ID, primary: Boolean): [Translation!]!
+  snippet(languageId: ID, primary: Boolean): [Translation!]!
+  description(languageId: ID, primary: Boolean): [Translation!]!
+  studyQuestions(languageId: ID, primary: Boolean): [Translation!]!
+  image: String
+  imageAlt(languageId: ID, primary: Boolean): [Translation!]!
+  variantLanguages: [Language!]!
+  variantLanguagesCount: Int!
+
+  """slug is a permanent link to the arclightVideo."""
+  slug: String!
+  noIndex: Boolean
+  children: [ArclightVideo!]!
+
+  """the number value of the amount of children on a arclightVideo"""
+  childrenCount: Int!
+  variantLanguagesWithSlug: [LanguageWithSlug!]!
+}
+
+enum ArclightVideoLabel
+  @join__type(graph: ARCLIGHT_VIDEOS)
+{
+  collection @join__enumValue(graph: ARCLIGHT_VIDEOS)
+  episode @join__enumValue(graph: ARCLIGHT_VIDEOS)
+  featureFilm @join__enumValue(graph: ARCLIGHT_VIDEOS)
+  segment @join__enumValue(graph: ARCLIGHT_VIDEOS)
+  series @join__enumValue(graph: ARCLIGHT_VIDEOS)
+  shortFilm @join__enumValue(graph: ARCLIGHT_VIDEOS)
+}
+
+input ArclightVideosFilter
+  @join__type(graph: ARCLIGHT_VIDEOS)
+{
+  availableVariantLanguageIds: [ID!]
+  title: String
+  labels: [ArclightVideoLabel!]
+  ids: [ID!]
+  subtitleLanguageIds: [ID!]
+}
+
 interface Block
   @join__type(graph: JOURNEYS)
 {
@@ -180,11 +258,12 @@ enum ButtonVariant
 }
 
 enum CacheControlScope
+  @join__type(graph: ARCLIGHT_VIDEOS)
   @join__type(graph: LANGUAGES)
   @join__type(graph: VIDEOS)
 {
-  PUBLIC @join__enumValue(graph: LANGUAGES) @join__enumValue(graph: VIDEOS)
-  PRIVATE @join__enumValue(graph: LANGUAGES) @join__enumValue(graph: VIDEOS)
+  PUBLIC @join__enumValue(graph: ARCLIGHT_VIDEOS) @join__enumValue(graph: LANGUAGES) @join__enumValue(graph: VIDEOS)
+  PRIVATE @join__enumValue(graph: ARCLIGHT_VIDEOS) @join__enumValue(graph: LANGUAGES) @join__enumValue(graph: VIDEOS)
 }
 
 type CardBlock implements Block
@@ -480,12 +559,13 @@ enum IconSize
 }
 
 enum IdType
+  @join__type(graph: ARCLIGHT_VIDEOS)
   @join__type(graph: JOURNEYS)
   @join__type(graph: LANGUAGES)
   @join__type(graph: VIDEOS)
 {
-  databaseId @join__enumValue(graph: JOURNEYS) @join__enumValue(graph: LANGUAGES) @join__enumValue(graph: VIDEOS)
-  slug @join__enumValue(graph: JOURNEYS) @join__enumValue(graph: LANGUAGES) @join__enumValue(graph: VIDEOS)
+  databaseId @join__enumValue(graph: ARCLIGHT_VIDEOS) @join__enumValue(graph: JOURNEYS) @join__enumValue(graph: LANGUAGES) @join__enumValue(graph: VIDEOS)
+  slug @join__enumValue(graph: ARCLIGHT_VIDEOS) @join__enumValue(graph: JOURNEYS) @join__enumValue(graph: LANGUAGES) @join__enumValue(graph: VIDEOS)
 }
 
 type ImageBlock implements Block
@@ -551,6 +631,7 @@ input ImageBlockUpdateInput
 scalar join__FieldSet
 
 enum join__Graph {
+  ARCLIGHT_VIDEOS @join__graph(name: "arclight-videos", url: "http://127.0.0.1:4007/graphql")
   JOURNEYS @join__graph(name: "journeys", url: "http://127.0.0.1:4001/graphql")
   LANGUAGES @join__graph(name: "languages", url: "http://127.0.0.1:4003/graphql")
   MEDIA @join__graph(name: "media", url: "http://127.0.0.1:4005/graphql")
@@ -703,6 +784,7 @@ input JourneyViewEventCreateInput
 }
 
 type Language
+  @join__type(graph: ARCLIGHT_VIDEOS, key: "id")
   @join__type(graph: JOURNEYS, key: "id")
   @join__type(graph: LANGUAGES, key: "id")
   @join__type(graph: MEDIA, key: "id")
@@ -724,6 +806,7 @@ enum LanguageIdType
 }
 
 type LanguageWithSlug
+  @join__type(graph: ARCLIGHT_VIDEOS)
   @join__type(graph: VIDEOS)
 {
   language: Language
@@ -975,6 +1058,7 @@ type PowerBiEmbed
 }
 
 type Query
+  @join__type(graph: ARCLIGHT_VIDEOS)
   @join__type(graph: JOURNEYS)
   @join__type(graph: LANGUAGES)
   @join__type(graph: MEDIA)
@@ -982,6 +1066,8 @@ type Query
   @join__type(graph: USERS)
   @join__type(graph: VIDEOS)
 {
+  arclightVideos(where: ArclightVideosFilter, offset: Int, limit: Int): [ArclightVideo!]! @join__field(graph: ARCLIGHT_VIDEOS)
+  arclightVideo(id: ID!, idType: IdType): ArclightVideo @join__field(graph: ARCLIGHT_VIDEOS)
   adminJourneys(status: [JourneyStatus!], template: Boolean): [Journey!]! @join__field(graph: JOURNEYS)
   adminJourneysReport(reportType: JourneysReportType!): PowerBiEmbed @join__field(graph: JOURNEYS)
   adminJourney(id: ID!, idType: IdType): Journey @join__field(graph: JOURNEYS)
@@ -1391,6 +1477,7 @@ enum ThemeName
 }
 
 type Translation
+  @join__type(graph: ARCLIGHT_VIDEOS)
   @join__type(graph: JOURNEYS)
   @join__type(graph: LANGUAGES)
   @join__type(graph: MEDIA)

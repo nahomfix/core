@@ -1,0 +1,68 @@
+extend type Language @key(fields: "id") {
+  id: ID! @external
+}
+
+enum IdType {
+  databaseId
+  slug
+}
+
+enum ArclightVideoLabel {
+  collection
+  episode
+  featureFilm
+  segment
+  series
+  shortFilm
+}
+
+type LanguageWithSlug {
+  language: Language
+  slug: String
+}
+
+type ArclightVideo
+  @key(fields: "id primaryLanguageId")
+  @cacheControl(maxAge: 86400) {
+  id: ID!
+  label: ArclightVideoLabel!
+  primaryLanguageId: ID!
+  title(languageId: ID, primary: Boolean): [Translation!]!
+  seoTitle(languageId: ID, primary: Boolean): [Translation!]!
+  snippet(languageId: ID, primary: Boolean): [Translation!]!
+  description(languageId: ID, primary: Boolean): [Translation!]!
+  studyQuestions(languageId: ID, primary: Boolean): [Translation!]!
+  image: String
+  imageAlt(languageId: ID, primary: Boolean): [Translation!]!
+  variantLanguages: [Language!]!
+  variantLanguagesCount: Int!
+  """
+  slug is a permanent link to the arclightVideo.
+  """
+  slug: String!
+  noIndex: Boolean
+  children: [ArclightVideo!]!
+  """
+  the number value of the amount of children on a arclightVideo
+  """
+  childrenCount: Int!
+  variantLanguagesWithSlug: [LanguageWithSlug!]!
+}
+
+input ArclightVideosFilter {
+  availableVariantLanguageIds: [ID!]
+  title: String
+  labels: [ArclightVideoLabel!]
+  ids: [ID!]
+  subtitleLanguageIds: [ID!]
+}
+
+type Query {
+  arclightVideos(
+    where: ArclightVideosFilter
+    offset: Int
+    limit: Int
+  ): [ArclightVideo!]! @cacheControl(maxAge: 86400)
+  arclightVideo(id: ID!, idType: IdType): ArclightVideo
+    @cacheControl(maxAge: 86400)
+}

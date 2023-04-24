@@ -1,6 +1,7 @@
 {
   "version": 2,
   "projects": {
+    "api-arclight-videos": "apps/api-arclight-videos",
     "api-gateway": "apps/api-gateway",
     "api-journeys": "apps/api-journeys",
     "api-languages": "apps/api-languages",

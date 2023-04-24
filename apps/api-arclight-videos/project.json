@@ -1,0 +1,96 @@
+{
+  "root": "apps/api-arclight-videos",
+  "sourceRoot": "apps/api-arclight-videos/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/node:webpack",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/api-arclight-videos",
+        "main": "apps/api-arclight-videos/src/main.ts",
+        "tsConfig": "apps/api-arclight-videos/tsconfig.app.json",
+        "assets": [
+          "apps/api-arclight-videos/src/assets",
+          {
+            "glob": "**/*.graphql",
+            "input": "apps/api-arclight-videos/src/app/",
+            "output": "./assets"
+          },
+          {
+            "glob": "**/*.graphql",
+            "input": "libs/nest/common/src/lib/TranslationModule/",
+            "output": "./assets"
+          }
+        ],
+        "generatePackageJson": true
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false,
+          "fileReplacements": [
+            {
+              "replace": "apps/api-arclight-videos/src/environments/environment.ts",
+              "with": "apps/api-arclight-videos/src/environments/environment.prod.ts"
+            }
+          ]
+        }
+      }
+    },
+    "seed": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "command": "npx ts-node apps/api-arclight-videos/db/seed.ts"
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/node:node",
+      "options": {
+        "buildTarget": "api-arclight-videos:build",
+        "inspect": false
+      }
+    },
+    "watcher": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "command": "npx ts-node tools/scripts/generate-typings.ts api-arclight-videos"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/api-arclight-videos/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/apps/api-arclight-videos"],
+      "options": {
+        "jestConfig": "apps/api-arclight-videos/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "generate-graphql": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "command": "rover subgraph introspect http://localhost:4007/graphql > apps/api-arclight-videos/schema.graphql"
+      }
+    },
+    "subgraph-check": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "command": "rover subgraph check API-GATEWAY-0zuda@current --name api-arclight-videos --schema apps/api-arclight-videos/schema.graphql"
+      }
+    },
+    "fetch-secrets": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "command": "DOPPLER_TOKEN=$DOPPLER_API_ARCLIGHT_TOKEN doppler secrets download --no-file --format=env-no-quotes --project api-arclight-videos > apps/api-arclight-videos/.env"
+      }
+    }
+  },
+  "tags": []
+}

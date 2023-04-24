@@ -1,0 +1,29 @@
+enum ArclightVariantDownloadQuality {
+  low
+  high
+}
+
+type ArclightVariantDownload {
+  quality: ArclightVariantDownloadQuality!
+  size: Float!
+  url: String!
+}
+
+type ArclightVariant {
+  id: String!
+  hls: String
+  downloads: [ArclightVariantDownload!]!
+  # duration in seconds
+  duration: Int!
+  language: Language!
+  subtitle(languageId: ID, primary: Boolean): [Translation!]!
+  subtitleCount: Int!
+  """
+  slug is a permanent link to the video variant.
+  """
+  slug: String!
+}
+
+extend type ArclightVideo {
+  variant(languageId: ID): ArclightVariant
+}

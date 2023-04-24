@@ -45,6 +45,12 @@ locals {
   }
 }
 
+module "api-arclight-videos" {
+  source        = "../../../apps/api-arclight-videos/infrastructure"
+  ecs_config    = local.internal_ecs_config
+  doppler_token = data.aws_ssm_parameter.doppler_api_arclight_videos_prod_token.value
+}
+
 module "api-gateway" {
   source        = "../../../apps/api-gateway/infrastructure"
   ecs_config    = local.public_ecs_config

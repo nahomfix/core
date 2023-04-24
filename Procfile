@@ -1,3 +1,5 @@
+arclight-videos-serve: nx serve api-arclight-videos
+archlight-videos-watcher: nx watcher api-arclight-videos
 journeys-serve: nx serve api-journeys
 journeys-watcher: nx watcher api-journeys
 media-serve: nx serve api-media
