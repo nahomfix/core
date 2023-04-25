@@ -1,3 +1,7 @@
+data "aws_ssm_parameter" "doppler_api_arclight_videos_prod_token" {
+  name = "/terraform/prd/DOPPLER_API_ARCLIGHT_VIDEOS_PROD_TOKEN"
+}
+
 data "aws_ssm_parameter" "doppler_api_gateway_prod_token" {
   name = "/terraform/prd/DOPPLER_API_GATEWAY_PROD_TOKEN"
 }

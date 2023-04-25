@@ -10,6 +10,10 @@ data "aws_iam_role" "ecs_task_execution_role" {
   name = "jfp-ecs-task-execution-role"
 }
 
+data "aws_ssm_parameter" "doppler_api_arclight_videos_prod_token" {
+  name = "/terraform/prd/DOPPLER_API_ARCLIGHT_VIDEOS_PROD_TOKEN"
+}
+
 data "aws_ssm_parameter" "doppler_api_gateway_prod_token" {
   name = "/terraform/prd/DOPPLER_API_GATEWAY_PROD_TOKEN"
 }
