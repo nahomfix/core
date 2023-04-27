@@ -38,9 +38,18 @@ CREATE TABLE "Variant" (
     "duration" INTEGER NOT NULL,
     "slug" TEXT NOT NULL,
     "videoId" TEXT NOT NULL,
-    "subtitleContentId" UUID,
 
     CONSTRAINT "Variant_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Subtitle" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "variantId" TEXT NOT NULL,
+    "languageId" TEXT NOT NULL,
+    "url" TEXT NOT NULL,
+
+    CONSTRAINT "Subtitle_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -82,6 +91,18 @@ CREATE UNIQUE INDEX "Children_parentId_childId_key" ON "Children"("parentId", "c
 -- CreateIndex
 CREATE UNIQUE INDEX "Variant_slug_key" ON "Variant"("slug");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "Subtitle_variantId_languageId_key" ON "Subtitle"("variantId", "languageId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Download_variantId_quality_key" ON "Download"("variantId", "quality");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Content_text_languageId_key" ON "Content"("text", "languageId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Translation_contentId_languageId_key" ON "Translation"("contentId", "languageId");
+
 -- AddForeignKey
 ALTER TABLE "Video" ADD CONSTRAINT "Video_titleContentId_fkey" FOREIGN KEY ("titleContentId") REFERENCES "Content"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -110,7 +131,7 @@ ALTER TABLE "StudyQuestion" ADD CONSTRAINT "StudyQuestion_contentId_fkey" FOREIG
 ALTER TABLE "Variant" ADD CONSTRAINT "Variant_videoId_fkey" FOREIGN KEY ("videoId") REFERENCES "Video"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Variant" ADD CONSTRAINT "Variant_subtitleContentId_fkey" FOREIGN KEY ("subtitleContentId") REFERENCES "Content"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Subtitle" ADD CONSTRAINT "Subtitle_variantId_fkey" FOREIGN KEY ("variantId") REFERENCES "Variant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Download" ADD CONSTRAINT "Download_variantId_fkey" FOREIGN KEY ("variantId") REFERENCES "Variant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

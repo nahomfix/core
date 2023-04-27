@@ -43,6 +43,15 @@
       "name": "tags",
       "database": "tags",
       "username": "postgres"
+    },
+    {
+      "previewLimit": 50,
+      "server": "db",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "arclight-videos",
+      "database": "arclight-videos",
+      "username": "postgres"
     }
   ],
   "editor.codeActionsOnSave": {
