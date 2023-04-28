@@ -1,9 +1,11 @@
 export {
-  fetchMediaComponentsAndCreateVideos,
+  fetchMediaComponentsAndTransformToVideos,
   fetchMediaLanguagesAndTransformToLanguages,
   getArclightMediaLanguages,
   getArclightMediaComponents,
   getArclightMediaComponentLanguages,
   getArclightMediaComponentLinks,
+  transformArclightMediaComponentLanguageToVideoVariant,
+  transformArclightMediaComponentToVideo,
   transformArclightMediaLanguageToLanguage
 } from './arclight'

@@ -48,6 +48,8 @@ model StudyQuestion {
   contentId String  @db.Uuid
   video     Video   @relation(fields: [videoId], references: [id])
   videoId   String
+
+  @@unique([contentId, videoId])
 }
 
 model Variant {

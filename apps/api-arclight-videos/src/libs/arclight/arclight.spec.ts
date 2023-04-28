@@ -217,16 +217,14 @@ describe('arclight', () => {
       languageId: '529',
       duration: 1,
       hls: 'hlsUrl',
-      subtitle: [
+      subtitles: [
         {
           languageId: '529',
-          primary: true,
-          value: 'subtitleUrl529'
+          url: 'subtitleUrl529'
         },
         {
           languageId: '2048',
-          primary: false,
-          value: 'subtitleUrl2048'
+          url: 'subtitleUrl2048'
         }
       ],
       downloads: [
@@ -264,7 +262,7 @@ describe('arclight', () => {
       ).toEqual({
         ...videoVariant,
         downloads: [],
-        subtitle: [],
+        subtitles: [],
         hls: undefined
       })
     })
@@ -282,7 +280,7 @@ describe('arclight', () => {
         duration: 0,
         hls: undefined,
         downloads: [],
-        subtitle: []
+        subtitles: []
       })
     })
 
@@ -293,7 +291,7 @@ describe('arclight', () => {
           mediaComponent,
           language
         )
-      ).toEqual({ ...videoVariant, subtitle: [] })
+      ).toEqual({ ...videoVariant, subtitles: [] })
     })
 
     it('transforms media component language without streamingUrls to variant', () => {
@@ -379,39 +377,33 @@ describe('arclight', () => {
       }
     ]
     const video: Video = {
-      _key: 'mediaComponentId',
+      id: 'mediaComponentId',
+      metadataLanguageId: '529',
       childIds: [],
-      description: [
-        { languageId: '529', primary: true, value: 'longDescription' }
-      ],
+      description: 'longDescription',
       image: 'mobileCinematicHigh',
-      imageAlt: [{ languageId: '529', primary: true, value: 'title' }],
+      imageAlt: 'title',
       label: 'video',
       noIndex: false,
       primaryLanguageId: '529',
-      seoTitle: [{ languageId: '529', primary: true, value: 'title' }],
       slug: 'title',
-      snippet: [
-        { languageId: '529', primary: true, value: 'shortDescription' }
-      ],
+      snippet: 'shortDescription',
       studyQuestions: [],
-      title: [{ languageId: '529', primary: true, value: 'title' }],
+      title: 'title',
       variants: [
         {
           id: 'refId',
           languageId: '529',
           duration: 1,
           hls: 'hlsUrl',
-          subtitle: [
+          subtitles: [
             {
               languageId: '529',
-              primary: true,
-              value: 'subtitleUrl529'
+              url: 'subtitleUrl529'
             },
             {
               languageId: '2048',
-              primary: false,
-              value: 'subtitleUrl2048'
+              url: 'subtitleUrl2048'
             }
           ],
           downloads: [
@@ -494,13 +486,7 @@ describe('arclight', () => {
         )
       ).toEqual({
         ...video,
-        studyQuestions: [
-          {
-            languageId: '529',
-            primary: true,
-            value: 'How can I know Jesus?'
-          }
-        ]
+        studyQuestions: ['How can I know Jesus?']
       })
       expect(usedSlugs).toEqual(['title'])
     })
@@ -521,30 +507,10 @@ describe('arclight', () => {
         )
       ).toEqual({
         ...video,
-        title: [
-          {
-            languageId: '529',
-            primary: true,
-            value:
-              'The Quick Brown Fox Jumps Over The Lazy Dog Many Times Over And Over Until It Gets Cut Off When Over 100 Characters'
-          }
-        ],
-        seoTitle: [
-          {
-            languageId: '529',
-            primary: true,
-            value:
-              'The Quick Brown Fox Jumps Over The Lazy Dog Many Times Over And Over Until It Gets Cut Off When Over 100 Characters'
-          }
-        ],
-        imageAlt: [
-          {
-            languageId: '529',
-            primary: true,
-            value:
-              'The Quick Brown Fox Jumps Over The Lazy Dog Many Times Over And Over Until It Gets Cut Off When Ove'
-          }
-        ],
+        title:
+          'The Quick Brown Fox Jumps Over The Lazy Dog Many Times Over And Over Until It Gets Cut Off When Over 100 Characters',
+        imageAlt:
+          'The Quick Brown Fox Jumps Over The Lazy Dog Many Times Over And Over Until It Gets Cut Off When Ove',
         slug: 'the-quick-brown-fox-jumps-over-the-lazy-dog-many-times-over-and-over-until-it-gets-cut-off-when-over-100-characters',
         variants: [
           {
@@ -704,23 +670,19 @@ describe('arclight', () => {
         fetchMediaComponentsAndTransformToVideos(languages, [], 1)
       ).resolves.toEqual([
         {
-          _key: 'mediaComponentId',
+          id: 'mediaComponentId',
           childIds: ['otherMediaComponentId'],
-          description: [
-            { languageId: '529', primary: true, value: 'longDescription' }
-          ],
+          description: 'longDescription',
           image: 'mobileCinematicHigh',
-          imageAlt: [{ languageId: '529', primary: true, value: 'title' }],
+          imageAlt: 'title',
           label: 'video',
           noIndex: false,
           primaryLanguageId: '529',
-          seoTitle: [{ languageId: '529', primary: true, value: 'title' }],
+          metadataLanguageId: '529',
           slug: 'title',
-          snippet: [
-            { languageId: '529', primary: true, value: 'shortDescription' }
-          ],
+          snippet: 'shortDescription',
           studyQuestions: [],
-          title: [{ languageId: '529', primary: true, value: 'title' }],
+          title: 'title',
           variants: [
             {
               downloads: [
@@ -732,13 +694,9 @@ describe('arclight', () => {
               id: 'refId',
               languageId: '529',
               slug: 'title/english',
-              subtitle: [
-                { languageId: '529', primary: true, value: 'subtitleUrl529' },
-                {
-                  languageId: '2048',
-                  primary: false,
-                  value: 'subtitleUrl2048'
-                }
+              subtitles: [
+                { languageId: '529', url: 'subtitleUrl529' },
+                { languageId: '2048', url: 'subtitleUrl2048' }
               ]
             }
           ]

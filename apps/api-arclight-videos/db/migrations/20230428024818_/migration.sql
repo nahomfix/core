@@ -89,6 +89,9 @@ CREATE UNIQUE INDEX "Video_slug_key" ON "Video"("slug");
 CREATE UNIQUE INDEX "Children_parentId_childId_key" ON "Children"("parentId", "childId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "StudyQuestion_contentId_videoId_key" ON "StudyQuestion"("contentId", "videoId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Variant_slug_key" ON "Variant"("slug");
 
 -- CreateIndex
