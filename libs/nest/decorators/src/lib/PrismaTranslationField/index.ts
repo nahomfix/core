@@ -1,0 +1,1 @@
+export { PrismaTranslationField } from './PrismaTranslationField'

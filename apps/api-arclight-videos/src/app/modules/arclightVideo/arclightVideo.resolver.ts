@@ -1,4 +1,4 @@
-import { TranslationField } from '@core/nest/decorators/TranslationField'
+import { PrismaTranslationField } from '@core/nest/decorators/PrismaTranslationField'
 import {
   Resolver,
   Query,
@@ -10,17 +10,17 @@ import {
 } from '@nestjs/graphql'
 import { FieldNode, GraphQLResolveInfo, Kind } from 'graphql'
 import { compact } from 'lodash'
-
 import {
-  IdType,
-  ArclightVideo,
-  ArclightVideosFilter
-} from '../../__generated__/graphql'
-import { ArclightVideoService } from './arclightVideo.service'
+  Video as VideoDB,
+  Children as ChildrenDB
+} from '.prisma/api-arclight-videos-client'
+
+import { IdType, ArclightVideosFilter } from '../../__generated__/graphql'
+import { PrismaService } from '../prisma/prisma.service'
 
 @Resolver('ArclightVideo')
 export class ArclightVideoResolver {
-  constructor(private readonly arclightVideoService: ArclightVideoService) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   @Query()
   async arclightVideos(
@@ -28,17 +28,61 @@ export class ArclightVideoResolver {
     @Args('where') where?: ArclightVideosFilter,
     @Args('offset') offset?: number,
     @Args('limit') limit?: number
-  ): Promise<ArclightVideo[]> {
-    return await this.arclightVideoService.filterAll({
-      title: where?.title ?? undefined,
-      availableVariantLanguageIds:
-        where?.availableVariantLanguageIds ?? undefined,
-      ids: where?.ids ?? undefined,
-      variantLanguageId: this.extractVariantLanguageId(info),
-      labels: where?.labels ?? undefined,
-      subtitleLanguageIds: where?.subtitleLanguageIds ?? undefined,
-      offset,
-      limit
+  ): Promise<VideoDB[]> {
+    return await this.prismaService.video.findMany({
+      where: {
+        title: {
+          is: {
+            text: {
+              contains: where?.title ?? undefined
+            }
+          }
+        },
+        variants: {
+          some: {
+            languageId: {
+              in: where?.availableVariantLanguageIds ?? undefined
+            },
+            subtitles: {
+              some: {
+                languageId: {
+                  in: where?.subtitleLanguageIds ?? undefined
+                }
+              }
+            }
+          }
+        },
+        id: {
+          in: where?.ids ?? undefined
+        },
+        label: {
+          in: where?.labels ?? undefined
+        }
+      },
+      skip: offset,
+      take: limit,
+      include: {
+        title: {
+          include: {
+            translations: true
+          }
+        },
+        snippet: {
+          include: {
+            translations: true
+          }
+        },
+        description: {
+          include: {
+            translations: true
+          }
+        },
+        imageAlt: {
+          include: {
+            translations: true
+          }
+        }
+      }
     })
   }
 
@@ -47,15 +91,16 @@ export class ArclightVideoResolver {
     @Info() info: GraphQLResolveInfo,
     @Args('id') id: string,
     @Args('idType') idType: IdType = IdType.databaseId
-  ): Promise<ArclightVideo> {
+  ): Promise<VideoDB | null> {
     switch (idType) {
       case IdType.databaseId:
-        return await this.arclightVideoService.getArclightVideo(
-          id,
-          this.extractVariantLanguageId(info)
-        )
+        return await this.prismaService.video.findUnique({
+          where: { id }
+        })
       case IdType.slug:
-        return await this.arclightVideoService.getArclightVideoBySlug(id)
+        return await this.prismaService.video.findUnique({
+          where: { slug: id }
+        })
     }
   }
 
@@ -64,31 +109,50 @@ export class ArclightVideoResolver {
     __typename: 'ArclightVideo'
     id: string
     primaryLanguageId?: string | null
-  }): Promise<ArclightVideo> {
-    return await this.arclightVideoService.getArclightVideo(
-      reference.id,
-      reference.primaryLanguageId ?? undefined
-    )
+  }): Promise<VideoDB | null> {
+    const video = await this.prismaService.video.findUnique({
+      where: { id: reference.id },
+      include: {
+        children: {
+          include: {
+            child: true
+          }
+        },
+        title: {
+          include: {
+            translations: true
+          }
+        },
+        snippet: {
+          include: {
+            translations: true
+          }
+        },
+        description: {
+          include: {
+            translations: true
+          }
+        },
+        imageAlt: {
+          include: {
+            translations: true
+          }
+        }
+      }
+    })
+    return video
   }
 
   @ResolveField()
   async children(
     @Parent()
-    arclightVideo: {
-      childIds?: string[]
-      variant?: { languageId: string }
-    }
-  ): Promise<ArclightVideo[] | null> {
-    return arclightVideo.childIds != null
-      ? await this.arclightVideoService.getArclightVideosByIds(
-          arclightVideo.childIds,
-          arclightVideo.variant?.languageId
-        )
-      : null
+    video: VideoDB & { children: Array<ChildrenDB & { child: VideoDB }> }
+  ): Promise<VideoDB[]> {
+    return video.children.map(({ child }) => child)
   }
 
   @ResolveField()
-  @TranslationField('title')
+  @PrismaTranslationField('title')
   title(
     @Parent() language,
     @Args('languageId') languageId?: string,
@@ -96,15 +160,7 @@ export class ArclightVideoResolver {
   ): void {}
 
   @ResolveField()
-  @TranslationField('seoTitle')
-  seoTitle(
-    @Parent() language,
-    @Args('languageId') languageId?: string,
-    @Args('primary') primary?: boolean
-  ): void {}
-
-  @ResolveField()
-  @TranslationField('snippet')
+  @PrismaTranslationField('snippet')
   snippet(
     @Parent() language,
     @Args('languageId') languageId?: string,
@@ -112,7 +168,7 @@ export class ArclightVideoResolver {
   ): void {}
 
   @ResolveField()
-  @TranslationField('description')
+  @PrismaTranslationField('description')
   description(
     @Parent() language,
     @Args('languageId') languageId?: string,
@@ -120,7 +176,7 @@ export class ArclightVideoResolver {
   ): void {}
 
   @ResolveField()
-  @TranslationField('studyQuestions')
+  @PrismaTranslationField('studyQuestions')
   studyQuestions(
     @Parent() language,
     @Args('languageId') languageId?: string,
@@ -128,7 +184,7 @@ export class ArclightVideoResolver {
   ): void {}
 
   @ResolveField()
-  @TranslationField('imageAlt')
+  @PrismaTranslationField('imageAlt')
   imageAlt(
     @Parent() language,
     @Args('languageId') languageId?: string,

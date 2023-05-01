@@ -1,18 +1,14 @@
 import { Module, CacheModule } from '@nestjs/common'
 import { DatabaseModule } from '@core/nest/database/DatabaseModule'
+import { PrismaModule } from '../prisma/prisma.module'
 import {
   ArclightVideoResolver,
   LanguageWithSlugResolver
 } from './arclightVideo.resolver'
-import { ArclightVideoService } from './arclightVideo.service'
 
 @Module({
-  imports: [DatabaseModule, CacheModule.register()],
-  providers: [
-    ArclightVideoResolver,
-    ArclightVideoService,
-    LanguageWithSlugResolver
-  ],
-  exports: [ArclightVideoService]
+  imports: [DatabaseModule, CacheModule.register(), PrismaModule],
+  providers: [ArclightVideoResolver, LanguageWithSlugResolver],
+  exports: []
 })
 export class ArclightVideoModule {}

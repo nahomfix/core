@@ -11,12 +11,14 @@ import TranslationModule from '@core/nest/common/TranslationModule'
 import responseCachePlugin from 'apollo-server-plugin-response-cache'
 import { ArclightVideoModule } from './modules/arclightVideo/arclightVideo.module'
 import { ArclightVariantModule } from './modules/arclightVariant/arclightVariant.module'
+import { PrismaModule } from './modules/prisma/prisma.module'
 
 @Module({
   imports: [
     TranslationModule,
     ArclightVideoModule,
     ArclightVariantModule,
+    PrismaModule,
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
       typePaths:

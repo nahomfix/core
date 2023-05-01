@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit, INestApplication } from '@nestjs/common'
-import { PrismaClient } from '.prisma/api-tags-client'
+import { PrismaClient } from '.prisma/api-arclight-videos-client'
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
