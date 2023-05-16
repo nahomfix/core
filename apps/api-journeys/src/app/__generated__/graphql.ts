@@ -1031,6 +1031,8 @@ export abstract class IQuery {
     abstract journeyVisitorsConnection(teamId: string, filter: JourneyVisitorFilter, first?: Nullable<number>, after?: Nullable<string>): JourneyVisitorsConnection | Promise<JourneyVisitorsConnection>;
 
     abstract journeyVisitorCount(filter: JourneyVisitorFilter): number | Promise<number>;
+
+    abstract journeyVisitorLocations(journeyId: string): Nullable<string>[] | Promise<Nullable<string>[]>;
 }
 
 export class UserJourney {

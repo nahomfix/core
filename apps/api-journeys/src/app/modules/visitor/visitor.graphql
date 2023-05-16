@@ -343,6 +343,7 @@ extend type Query {
   Get a JourneyVisitor count by JourneyVisitorFilter
   """
   journeyVisitorCount(filter: JourneyVisitorFilter!): Int!
+  journeyVisitorLocations(journeyId: ID!): [String]!
 }
 
 """

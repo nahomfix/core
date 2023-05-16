@@ -110,6 +110,18 @@ export class VisitorResolver {
     return visitor
   }
 
+  @Query()
+  async journeyVisitorLocations(
+    @Args('journeyId') journeyId: string
+  ): Promise<Array<string | null>> {
+    const result = await this.prismaService.visitor.findMany({
+      distinct: ['countryCode'],
+      where: { journeyVisitor: { some: { journeyId } } },
+      select: { countryCode: true }
+    })
+    return result == null ? [] : result.map((r) => r.countryCode)
+  }
+
   @Mutation()
   async visitorUpdate(
     @CurrentUserId() userId: string,

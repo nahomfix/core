@@ -1142,6 +1142,7 @@ type Query
 
   """Get a JourneyVisitor count by JourneyVisitorFilter"""
   journeyVisitorCount(filter: JourneyVisitorFilter!): Int! @join__field(graph: JOURNEYS)
+  journeyVisitorLocations(journeyId: ID!): [String]! @join__field(graph: JOURNEYS)
   countries: [Country!]! @join__field(graph: LANGUAGES)
   country(id: ID!, idType: IdType): Country! @join__field(graph: LANGUAGES)
   languages(offset: Int, limit: Int): [Language!]! @join__field(graph: LANGUAGES)
