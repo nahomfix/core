@@ -28,6 +28,7 @@ import {
   GetJourney_journey_blocks_ImageBlock as ImageBlock
 } from '../../../../../__generated__/GetJourney'
 import { BlockDeleteForCoverImage } from '../../../../../__generated__/BlockDeleteForCoverImage'
+import { blockDeleteUpdate } from '../../../../libs/blockDeleteUpdate/blockDeleteUpdate'
 
 export const DRAWER_WIDTH = 328
 
@@ -126,6 +127,11 @@ export function VideoDetails({
           blockDeleteId: videoBlock?.id,
           journeyId: journey?.id,
           parentBlockId: videoBlock?.parentBlockId
+        },
+        update(cache, { data }) {
+          if (journey != null) {
+            blockDeleteUpdate(videoBlock, data?.blockDelete, cache, journey.id)
+          }
         }
       })
     } else {
