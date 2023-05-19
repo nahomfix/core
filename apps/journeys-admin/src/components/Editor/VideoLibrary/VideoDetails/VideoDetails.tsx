@@ -23,6 +23,7 @@ import {
 import { LocalDetails } from '../VideoFromLocal/LocalDetails'
 import { YouTubeDetails } from '../VideoFromYouTube/YouTubeDetails'
 import {
+  GetJourney_journey_blocks_CardBlock as CardBlock,
   GetJourney_journey_blocks_VideoBlock as VideoBlock,
   GetJourney_journey_blocks_ImageBlock as ImageBlock
 } from '../../../../../__generated__/GetJourney'
@@ -95,11 +96,12 @@ export function VideoDetails({
   }
 
   const handleClearVideo = async (): Promise<void> => {
-    const videoBlock = selectedStep?.children
-      .find((child) => child.__typename === 'CardBlock')
-      ?.children.find(
-        (child) => child.__typename === 'VideoBlock'
-      ) as TreeBlock<VideoBlock>
+    const cardBlock = selectedStep?.children.find(
+      (child) => child.__typename === 'CardBlock'
+    ) as TreeBlock<CardBlock>
+    const videoBlock = cardBlock?.children.find(
+      (child) => child.__typename === 'VideoBlock'
+    ) as TreeBlock<VideoBlock>
     const imageBlock = videoBlock?.children.find(
       (child) => child.__typename === 'ImageBlock'
     ) as TreeBlock<ImageBlock>
@@ -112,12 +114,28 @@ export function VideoDetails({
         }
       })
     }
-    onSelect({
-      videoId: null,
-      videoVariantLanguageId: null,
-      posterBlockId: null,
-      source: VideoBlockSource.internal
-    })
+    // if normal video, run onselect
+    // if backgroundVideo, run blockDelete for video block
+    // if parentBlock.coverBlockId = videoBlock.id, then the video is a backgroundVideo
+
+    // if background video
+    if (cardBlock?.coverBlockId === videoBlock?.id) {
+      // delete videoBlock
+      await blockDeleteForCoverImage({
+        variables: {
+          blockDeleteId: videoBlock?.id,
+          journeyId: journey?.id,
+          parentBlockId: videoBlock?.parentBlockId
+        }
+      })
+    } else {
+      onSelect({
+        videoId: null,
+        videoVariantLanguageId: null,
+        posterBlockId: null,
+        source: VideoBlockSource.internal
+      })
+    }
   }
   return (
     <>
