@@ -7,6 +7,8 @@ import { useTranslation } from 'react-i18next'
 import { Attribute } from '../..'
 import { ChatPlatform } from '../../../../../../../__generated__/globalTypes'
 import { HostTitleFieldForm } from './HostForm/HostTitleFieldForm'
+import { HostAvatarsButton } from './HostForm/HostAvatarsButton/HostAvatarsButton'
+import { HostLocationFieldForm } from './HostForm/HostLocationFieldForm'
 
 export function Footer(): ReactElement {
   const { dispatch } = useEditor()
@@ -49,6 +51,8 @@ export function Footer(): ReactElement {
       children: (
         <div>
           <HostTitleFieldForm />
+          <HostLocationFieldForm />
+          <HostAvatarsButton />
         </div>
       )
     })
@@ -71,6 +75,8 @@ export function Footer(): ReactElement {
             children: (
               <div>
                 <HostTitleFieldForm />
+                <HostLocationFieldForm />
+                <HostAvatarsButton />
               </div>
             )
           })
