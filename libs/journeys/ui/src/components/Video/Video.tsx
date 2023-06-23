@@ -143,6 +143,16 @@ export function Video({
     if (selectedBlock !== undefined) {
       playerRef.current?.pause()
     }
+
+    const handleVisibilityChange = (): void => {
+      if (document.hidden) {
+        playerRef.current?.pause()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
   }, [selectedBlock])
 
   const eventVideoTitle = video?.title[0].value ?? title
