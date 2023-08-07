@@ -8,6 +8,8 @@ import { GraphQLModule } from '@nestjs/graphql'
 import { LoggerModule } from 'nestjs-pino'
 import { NestHealthModule } from '@core/nest/health'
 import { DatadogTraceModule } from 'nestjs-ddtrace'
+import { ApolloServerPluginUsageReporting } from 'apollo-server-core'
+import compact from 'lodash/compact'
 import { UserModule } from './modules/user/user.module'
 
 @Module({
@@ -27,7 +29,15 @@ import { UserModule } from './modules/user/user.module'
             ]
           : [join(process.cwd(), 'assets/**/*.graphql')],
       context: ({ req }) => ({ headers: req.headers }),
-      cache: 'bounded'
+      cache: 'bounded',
+      plugins: compact([
+        process.env.NODE_ENV === 'production'
+          ? ApolloServerPluginUsageReporting({
+              sendHeaders: { all: true },
+              sendVariableValues: { all: true }
+            })
+          : undefined
+      ])
     }),
     LoggerModule.forRoot({
       pinoHttp: {

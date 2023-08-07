@@ -10,6 +10,8 @@ import { DatadogTraceModule } from 'nestjs-ddtrace'
 import { NestHealthModule } from '@core/nest/health'
 import TranslationModule from '@core/nest/common/TranslationModule'
 import responseCachePlugin from 'apollo-server-plugin-response-cache'
+import { ApolloServerPluginUsageReporting } from 'apollo-server-core'
+import compact from 'lodash/compact'
 import { VideoModule } from './modules/video/video.module'
 import { VideoVariantModule } from './modules/videoVariant/videoVariant.module'
 
@@ -33,7 +35,15 @@ import { VideoVariantModule } from './modules/videoVariant/videoVariant.module'
           : [join(process.cwd(), 'assets/**/*.graphql')],
       context: ({ req }) => ({ headers: req.headers }),
       cache: 'bounded',
-      plugins: [responseCachePlugin()]
+      plugins: compact([
+        responseCachePlugin(),
+        process.env.NODE_ENV === 'production'
+          ? ApolloServerPluginUsageReporting({
+              sendHeaders: { all: true },
+              sendVariableValues: { all: true }
+            })
+          : undefined
+      ])
     }),
     LoggerModule.forRoot({
       pinoHttp: {

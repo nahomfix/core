@@ -8,6 +8,8 @@ import {
 import { LoggerModule } from 'nestjs-pino'
 import { DatadogTraceModule } from 'nestjs-ddtrace'
 import { NestHealthModule } from '@core/nest/health'
+import { ApolloServerPluginUsageReporting } from 'apollo-server-core'
+import compact from 'lodash/compact'
 import { CloudflareImageModule } from './modules/cloudflare/image/image.module'
 import { UnsplashImageModule } from './modules/unsplash/image/image.module'
 import { CloudflareVideoModule } from './modules/cloudflare/video/video.module'
@@ -31,7 +33,15 @@ import { CloudflareVideoModule } from './modules/cloudflare/video/video.module'
             ]
           : [join(process.cwd(), 'assets/**/*.graphql')],
       context: ({ req }) => ({ headers: req.headers }),
-      cache: 'bounded'
+      cache: 'bounded',
+      plugins: compact([
+        process.env.NODE_ENV === 'production'
+          ? ApolloServerPluginUsageReporting({
+              sendHeaders: { all: true },
+              sendVariableValues: { all: true }
+            })
+          : undefined
+      ])
     }),
     LoggerModule.forRoot({
       pinoHttp: {

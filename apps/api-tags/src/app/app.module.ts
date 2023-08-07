@@ -9,6 +9,8 @@ import { NestHealthModule } from '@core/nest/health'
 import { LoggerModule } from 'nestjs-pino'
 import { DatadogTraceModule } from 'nestjs-ddtrace'
 import TranslationModule from '@core/nest/common/TranslationModule'
+import { ApolloServerPluginUsageReporting } from 'apollo-server-core'
+import compact from 'lodash/compact'
 import { TagModule } from './modules/tag/tag.module'
 
 @Module({
@@ -28,7 +30,15 @@ import { TagModule } from './modules/tag/tag.module'
               )
             ]
           : [join(process.cwd(), 'assets/**/*.graphql')],
-      context: ({ req }) => ({ headers: req.headers })
+      context: ({ req }) => ({ headers: req.headers }),
+      plugins: compact([
+        process.env.NODE_ENV === 'production'
+          ? ApolloServerPluginUsageReporting({
+              sendHeaders: { all: true },
+              sendVariableValues: { all: true }
+            })
+          : undefined
+      ])
     }),
     LoggerModule.forRoot({
       pinoHttp: {
