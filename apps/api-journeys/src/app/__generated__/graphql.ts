@@ -1117,6 +1117,8 @@ export abstract class IQuery {
 
     abstract journey(id: string, idType?: Nullable<IdType>): Journey | Promise<Journey>;
 
+    abstract journeyTitleAi(id: string, idType?: Nullable<IdType>): string | Promise<string>;
+
     abstract getJourneyProfile(): Nullable<JourneyProfile> | Promise<Nullable<JourneyProfile>>;
 
     abstract journeyVisitorsConnection(filter: JourneyVisitorFilter, first?: Nullable<number>, after?: Nullable<string>, sort?: Nullable<JourneyVisitorSort>): JourneyVisitorsConnection | Promise<JourneyVisitorsConnection>;

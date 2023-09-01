@@ -1318,6 +1318,7 @@ type Query
   adminJourney(id: ID!, idType: IdType): Journey! @join__field(graph: JOURNEYS)
   journeys(where: JourneysFilter): [Journey!]! @join__field(graph: JOURNEYS)
   journey(id: ID!, idType: IdType): Journey! @join__field(graph: JOURNEYS)
+  journeyTitleAi(id: ID!, idType: IdType): String! @join__field(graph: JOURNEYS)
   getJourneyProfile: JourneyProfile @join__field(graph: JOURNEYS)
 
   """Get a list of Visitor Information by Journey"""

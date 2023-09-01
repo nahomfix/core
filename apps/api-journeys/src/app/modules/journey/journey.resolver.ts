@@ -12,6 +12,7 @@ import { GraphQLError } from 'graphql'
 import filter from 'lodash/filter'
 import isEmpty from 'lodash/isEmpty'
 import omit from 'lodash/omit'
+import OpenAI from 'openai'
 import slugify from 'slugify'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -199,6 +200,35 @@ export class JourneyResolver {
         extensions: { code: 'NOT_FOUND' }
       })
     return journey
+  }
+
+  @Query()
+  async journeyTitleAi(
+    @Args('id') id: string,
+    @Args('idType') idType: IdType = IdType.databaseId
+  ): Promise<string | null> {
+    console.log('HERE', id)
+    const blocks = await this.prismaService.block.findMany({
+      where: { journeyId: id, typename: 'TypographyBlock' }
+    })
+    const openai = new OpenAI({
+      apiKey: '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'
+    })
+
+    let texts = ''
+    blocks.forEach((block) => (texts = `${texts}, ${block.content as string}`))
+
+    const res = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        {
+          role: 'user',
+          content: `Create a 4 worded title and a 2 sentence description based of the following text: ${texts}`
+        }
+      ]
+    })
+
+    return res.choices[0].message.content
   }
 
   @Mutation()

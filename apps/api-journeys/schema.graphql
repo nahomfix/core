@@ -1702,6 +1702,7 @@ extend type Query {
   adminJourney(id: ID!, idType: IdType): Journey!
   journeys(where: JourneysFilter): [Journey!]!
   journey(id: ID!, idType: IdType): Journey!
+  journeyTitleAi(id: ID!, idType: IdType): String!
   getJourneyProfile: JourneyProfile
 
   """Get a list of Visitor Information by Journey"""

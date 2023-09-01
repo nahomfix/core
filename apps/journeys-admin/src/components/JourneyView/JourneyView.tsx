@@ -14,6 +14,7 @@ import { GetUserRole } from '../../../__generated__/GetUserRole'
 import { JourneysReportType, Role } from '../../../__generated__/globalTypes'
 import { MemoizedDynamicReport } from '../DynamicPowerBiReport'
 
+import { AiTitle } from './AiTitle'
 import { CardView } from './CardView'
 import { DatePreview } from './DatePreview'
 import { JourneyLink } from './JourneyLink'
@@ -83,6 +84,7 @@ export function JourneyView({ journeyType }: JourneyViewProps): ReactElement {
           }}
         >
           {journeyType === 'Template' && <DatePreview />}
+          {journey?.id != null && <AiTitle id={journey.id} />}
           <TitleDescription isPublisher={isPublisher} />
         </Stack>
       </Box>

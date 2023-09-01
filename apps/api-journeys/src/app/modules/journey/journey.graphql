@@ -89,6 +89,7 @@ extend type Query {
   adminJourney(id: ID!, idType: IdType): Journey!
   journeys(where: JourneysFilter): [Journey!]!
   journey(id: ID!, idType: IdType): Journey!
+  journeyTitleAi(id: ID!, idType: IdType): String!
 }
 
 input JourneyCreateInput {
