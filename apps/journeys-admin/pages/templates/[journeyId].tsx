@@ -2,9 +2,9 @@ import { gql, useQuery } from '@apollo/client'
 import { useRouter } from 'next/router'
 import {
   AuthAction,
-  useAuthUser,
-  withAuthUser,
-  withAuthUserTokenSSR
+  useUser,
+  withUser,
+  withUserTokenSSR
 } from 'next-firebase-auth'
 import { NextSeo } from 'next-seo'
 import { ReactElement } from 'react'
@@ -32,7 +32,7 @@ export const GET_TEMPLATE = gql`
 function TemplateDetails(): ReactElement {
   const { t } = useTranslation('apps-journeys-admin')
   const router = useRouter()
-  const AuthUser = useAuthUser()
+  const AuthUser = useUser()
   const { data } = useQuery<GetTemplate>(GET_TEMPLATE, {
     variables: { id: router.query.journeyId }
   })
@@ -64,9 +64,9 @@ function TemplateDetails(): ReactElement {
   )
 }
 
-export const getServerSideProps = withAuthUserTokenSSR({
+export const getServerSideProps = withUserTokenSSR({
   whenUnauthed: AuthAction.REDIRECT_TO_LOGIN
-})(async ({ AuthUser, locale }) => {
+})(async ({ user: AuthUser, locale }) => {
   if (AuthUser == null)
     return { redirect: { permanent: false, destination: '/users/sign-in' } }
 
@@ -85,6 +85,6 @@ export const getServerSideProps = withAuthUserTokenSSR({
   }
 })
 
-export default withAuthUser({
+export default withUser({
   whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN
 })(TemplateDetails)
