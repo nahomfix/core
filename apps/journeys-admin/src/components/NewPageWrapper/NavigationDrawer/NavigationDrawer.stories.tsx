@@ -2,7 +2,7 @@ import { MockedProvider } from '@apollo/client/testing'
 import { Meta, StoryObj } from '@storybook/react'
 import noop from 'lodash/noop'
 import { NextRouter } from 'next/router'
-import { AuthUser } from 'next-firebase-auth'
+import { User as AuthUser } from 'next-firebase-auth'
 import { ReactElement, useState } from 'react'
 
 import {
