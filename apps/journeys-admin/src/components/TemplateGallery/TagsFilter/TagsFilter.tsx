@@ -98,8 +98,9 @@ export function TagsFilter({
                 sx={{
                   position: 'sticky',
                   top: 0,
-                  py: 2,
-                  px: 5,
+                  pt: { xs: 5, sm: 9 },
+                  pb: 2,
+                  px: 6,
                   backgroundColor: 'background.paper',
                   zIndex: 99999
                 }}
@@ -111,7 +112,9 @@ export function TagsFilter({
                 }
               </Typography>
             )}
-            <Box>{params.children}</Box>
+            <Box sx={{ '> .MuiAutocomplete-option': { py: 0.25 } }}>
+              {params.children}
+            </Box>
           </li>
         )}
         renderOption={(props, option, { selected }) => (
@@ -131,9 +134,10 @@ export function TagsFilter({
           popper: {
             sx: {
               '& .MuiAutocomplete-listbox': {
-                display: 'flex',
+                pt: tagNames.length > 1 ? 0 : 2,
+                display: { xs: 'block', sm: 'flex' },
                 '> li': {
-                  flexGrow: 1
+                  flex: 1
                 }
               }
             }
