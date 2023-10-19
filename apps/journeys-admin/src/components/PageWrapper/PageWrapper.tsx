@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import Image from 'next/image'
 import NextLink from 'next/link'
-import { User } from 'next-firebase-auth'
+import { User } from 'next-firebase-auth-edge'
 import { ReactElement, ReactNode, useState } from 'react'
 
 import ChevronLeftIcon from '@core/shared/ui/icons/ChevronLeft'

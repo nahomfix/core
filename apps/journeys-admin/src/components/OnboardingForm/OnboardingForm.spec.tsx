@@ -8,7 +8,7 @@ import {
 } from '@formium/types'
 import { fireEvent, render, waitFor } from '@testing-library/react'
 import { NextRouter, useRouter } from 'next/router'
-import { User } from 'next-firebase-auth'
+import { User } from 'next-firebase-auth-edge'
 
 import {
   JOURNEY_PROFILE_ONBOARDING_FORM_COMPLETE,

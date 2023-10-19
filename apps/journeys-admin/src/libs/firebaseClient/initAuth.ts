@@ -1,5 +1,5 @@
 import absoluteUrl from 'next-absolute-url'
-import { init } from 'next-firebase-auth'
+import { init } from 'next-firebase-auth-edge'
 
 import { allowedHost } from '@core/journeys/ui/allowedHost'
 import { getFirebasePrivateKey } from '@core/shared/ui/getFirebasePrivateKey'

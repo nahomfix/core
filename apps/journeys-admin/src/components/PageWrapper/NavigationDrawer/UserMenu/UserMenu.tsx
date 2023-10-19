@@ -5,7 +5,7 @@ import Menu from '@mui/material/Menu'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import compact from 'lodash/compact'
-import { User } from 'next-firebase-auth'
+import { User } from 'next-firebase-auth-edge'
 import { ReactElement } from 'react'
 
 import Logout2Icon from '@core/shared/ui/icons/Logout2'

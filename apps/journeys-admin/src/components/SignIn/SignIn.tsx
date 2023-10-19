@@ -43,7 +43,7 @@ export function SignIn(): ReactElement {
     callbacks: {
       signInSuccessWithAuthResult: () =>
         // Don't automatically redirect. We handle redirects using
-        // `next-firebase-auth`.
+        // `next-firebase-auth-edge`.
         false
     }
   }

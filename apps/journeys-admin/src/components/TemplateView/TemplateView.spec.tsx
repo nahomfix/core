@@ -1,6 +1,6 @@
 import { MockedProvider } from '@apollo/client/testing'
 import { render, waitFor } from '@testing-library/react'
-import { User } from 'next-firebase-auth'
+import { User } from 'next-firebase-auth-edge'
 
 import { JourneyProvider } from '@core/journeys/ui/JourneyProvider'
 

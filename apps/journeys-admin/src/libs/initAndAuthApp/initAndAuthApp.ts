@@ -1,6 +1,6 @@
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { Redirect } from 'next'
-import { User } from 'next-firebase-auth'
+import { User } from 'next-firebase-auth-edge'
 import { SSRConfig } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { v4 as uuidv4 } from 'uuid'

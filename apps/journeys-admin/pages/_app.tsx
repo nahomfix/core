@@ -19,7 +19,7 @@ import { HelpScoutBeacon } from '../src/components/HelpScoutBeacon'
 import { TeamProvider } from '../src/components/Team/TeamProvider'
 import { ThemeProvider } from '../src/components/ThemeProvider'
 import { useApollo } from '../src/libs/apolloClient'
-import { initAuth } from '../src/libs/firebaseClient/initAuth'
+// import { initAuth } from '../src/libs/firebaseClient/initAuth'
 
 import '../public/swiper-pagination-override.css'
 

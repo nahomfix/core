@@ -1,6 +1,6 @@
 import { MockedProvider } from '@apollo/client/testing'
 import { fireEvent, render, waitFor } from '@testing-library/react'
-import { User } from 'next-firebase-auth'
+import { User } from 'next-firebase-auth-edge'
 import { SnackbarProvider } from 'notistack'
 
 import { UserMenu } from './UserMenu'

@@ -2,7 +2,7 @@ import { MockedProvider } from '@apollo/client/testing'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { fireEvent, render, waitFor } from '@testing-library/react'
 import { NextRouter } from 'next/router'
-import { User } from 'next-firebase-auth'
+import { User } from 'next-firebase-auth-edge'
 import { SnackbarProvider } from 'notistack'
 
 import { FlagsProvider } from '@core/shared/ui/FlagsProvider'

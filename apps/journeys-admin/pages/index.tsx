@@ -1,12 +1,12 @@
 import { gql } from '@apollo/client'
 import Stack from '@mui/material/Stack'
 import { useRouter } from 'next/router'
-import {
-  AuthAction,
-  useUser,
-  withUser,
-  withUserTokenSSR
-} from 'next-firebase-auth'
+// import {
+//   AuthAction,
+//   useUser,
+//   withUser,
+//   withUserTokenSSR
+// } from 'next-firebase-auth-edge'
 import { NextSeo } from 'next-seo'
 import { ReactElement } from 'react'
 import { useTranslation } from 'react-i18next'
