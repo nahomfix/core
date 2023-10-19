@@ -1,6 +1,7 @@
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
+// import { User } from 'firebase/auth'
 import { Redirect } from 'next'
-import { User } from 'next-firebase-auth-edge'
+// import { User } from 'next-firebase-auth-edge'
 import { SSRConfig } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { v4 as uuidv4 } from 'uuid'
@@ -10,6 +11,7 @@ import { getLaunchDarklyClient } from '@core/shared/ui/getLaunchDarklyClient'
 import i18nConfig from '../../../next-i18next.config'
 import { createApolloClient } from '../apolloClient'
 import { checkConditionalRedirect } from '../checkConditionalRedirect'
+import { User } from '../nextFirebaseAuthEdge/context'
 
 interface Props {
   user?: User
@@ -32,9 +34,9 @@ export async function initAndAuthApp({
   resolvedUrl
 }: Props): Promise<InitAndAuth> {
   const ldUser =
-    user?.id != null
+    user?.uid != null
       ? {
-          key: user.id,
+          key: user.uid,
           firstName: user.displayName ?? undefined,
           email: user.email ?? undefined
         }
@@ -51,7 +53,7 @@ export async function initAndAuthApp({
       i18nConfig
     ),
     getLaunchDarklyClient(ldUser),
-    user?.id != null ? user.getIdToken() : null
+    user?.uid != null ? user.getIdToken() : null
   ])
 
   const flags = (await launchDarklyClient.allFlagsState(ldUser)).toJSON() as {

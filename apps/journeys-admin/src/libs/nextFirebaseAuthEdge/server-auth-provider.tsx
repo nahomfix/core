@@ -38,8 +38,8 @@ export async function ServerAuthProvider({
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? '',
     cookieName: 'AuthToken',
     cookieSignatureKeys: [
-      process.env.COOKIE_SECRET_CURRENT,
-      process.env.COOKIE_SECRET_PREVIOUS
+      process.env.COOKIE_SECRET_CURRENT ?? '',
+      process.env.COOKIE_SECRET_PREVIOUS ?? ''
     ],
     cookieSerializeOptions: {
       path: '/',

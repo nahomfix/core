@@ -1,4 +1,5 @@
-import { AuthAction, withUser, withUserTokenSSR } from 'next-firebase-auth-edge'
+// import { AuthAction, withUser, withUserTokenSSR } from 'next-firebase-auth-edge'
+import { GetServerSideProps } from 'next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { NextSeo } from 'next-seo'
 import { ReactElement } from 'react'
@@ -7,7 +8,7 @@ import { useTranslation } from 'react-i18next'
 import i18nConfig from '../../next-i18next.config'
 import { SignIn } from '../../src/components/SignIn'
 
-function SignInPage(): ReactElement {
+export default function SignInPage(): ReactElement {
   const { t } = useTranslation('apps-journeys-admin')
   return (
     <>
@@ -17,9 +18,7 @@ function SignInPage(): ReactElement {
   )
 }
 
-export const getServerSideProps = withUserTokenSSR({
-  whenAuthed: AuthAction.REDIRECT_TO_APP
-})(async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       ...(await serverSideTranslations(
@@ -29,8 +28,4 @@ export const getServerSideProps = withUserTokenSSR({
       ))
     }
   }
-})
-
-export default withUser({
-  whenAuthed: AuthAction.REDIRECT_TO_APP
-})(SignInPage)
+}
