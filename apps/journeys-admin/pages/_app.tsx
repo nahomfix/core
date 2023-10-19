@@ -22,8 +22,9 @@ import { useApollo } from '../src/libs/apolloClient'
 // import { initAuth } from '../src/libs/firebaseClient/initAuth'
 
 import '../public/swiper-pagination-override.css'
+import { ServerAuthProvider } from '../src/libs/nextFirebaseAuthEdge/server-auth-provider'
 
-initAuth()
+// initAuth()
 const clientSideEmotionCache = createEmotionCache({})
 
 type JourneysAdminAppProps = NextJsAppProps<{
@@ -75,36 +76,38 @@ function JourneysAdminApp({
   }, [])
 
   return (
-    <FlagsProvider flags={pageProps.flags}>
-      <CacheProvider value={emotionCache}>
-        <ThemeProvider>
-          <DefaultSeo
-            titleTemplate={t('%s | Next Steps')}
-            defaultTitle={t('Admin | Next Steps')}
-          />
-          <HelpScoutBeacon />
-          <Head>
-            <meta
-              name="viewport"
-              content="minimum-scale=1, initial-scale=1, width=device-width"
+    <ServerAuthProvider>
+      <FlagsProvider flags={pageProps.flags}>
+        <CacheProvider value={emotionCache}>
+          <ThemeProvider>
+            <DefaultSeo
+              titleTemplate={t('%s | Next Steps')}
+              defaultTitle={t('Admin | Next Steps')}
             />
-          </Head>
+            <HelpScoutBeacon />
+            <Head>
+              <meta
+                name="viewport"
+                content="minimum-scale=1, initial-scale=1, width=device-width"
+              />
+            </Head>
 
-          <ApolloProvider client={apolloClient}>
-            <TeamProvider>
-              <SnackbarProvider
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right'
-                }}
-              >
-                <Component {...pageProps} />
-              </SnackbarProvider>
-            </TeamProvider>
-          </ApolloProvider>
-        </ThemeProvider>
-      </CacheProvider>
-    </FlagsProvider>
+            <ApolloProvider client={apolloClient}>
+              <TeamProvider>
+                <SnackbarProvider
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right'
+                  }}
+                >
+                  <Component {...pageProps} />
+                </SnackbarProvider>
+              </TeamProvider>
+            </ApolloProvider>
+          </ThemeProvider>
+        </CacheProvider>
+      </FlagsProvider>
+    </ServerAuthProvider>
   )
 }
 

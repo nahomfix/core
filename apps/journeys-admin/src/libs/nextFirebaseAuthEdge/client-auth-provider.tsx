@@ -49,7 +49,7 @@ export const AuthProvider: React.FunctionComponent<AuthProviderProps> = ({
     const unsubscribePromise = registerChangeListener()
 
     return () => {
-      await unsubscribePromise.then((unsubscribe) => unsubscribe())
+      void unsubscribePromise.then((unsubscribe) => unsubscribe())
     }
   })
 

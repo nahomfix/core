@@ -24,6 +24,7 @@ import { OnboardingPanelContent } from '../src/components/OnboardingPanelContent
 import { TeamMenu } from '../src/components/Team/TeamMenu'
 import { TeamSelect } from '../src/components/Team/TeamSelect'
 import { initAndAuthApp } from '../src/libs/initAndAuthApp'
+import { useAuth } from '../src/libs/nextFirebaseAuthEdge/context'
 
 export const ACCEPT_ALL_INVITES = gql`
   mutation AcceptAllInvites {
@@ -56,7 +57,7 @@ interface IndexPageProps {
 
 function IndexPage({ onboardingJourneys }: IndexPageProps): ReactElement {
   const { t } = useTranslation('apps-journeys-admin')
-  const user = useUser()
+  const user = useAuth()
   const { teams } = useFlags()
   const router = useRouter()
 
@@ -90,9 +91,7 @@ function IndexPage({ onboardingJourneys }: IndexPageProps): ReactElement {
   )
 }
 
-export const getServerSideProps = withUserTokenSSR({
-  whenUnauthed: AuthAction.REDIRECT_TO_LOGIN
-})(async ({ user, locale, resolvedUrl }) => {
+export const getServerSideProps = ({ user, locale, resolvedUrl }) => {
   if (user == null)
     return { redirect: { permanent: false, destination: '/users/sign-in' } }
 
