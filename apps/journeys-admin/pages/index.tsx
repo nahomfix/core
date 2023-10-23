@@ -26,6 +26,7 @@ import { TeamSelect } from '../src/components/Team/TeamSelect'
 import { initAndAuthApp } from '../src/libs/initAndAuthApp'
 import { User, useAuth } from '../src/libs/nextFirebaseAuthEdge/context'
 import { GetServerSideProps } from 'next'
+import { getAuth } from 'firebase/auth'
 
 export const ACCEPT_ALL_INVITES = gql`
   mutation AcceptAllInvites {
@@ -95,6 +96,7 @@ export default function IndexPage({
 }
 
 export const getServerSideProps = async ({ locale, resolvedUrl }) => {
+  const user = getAuth().currentUser
   if (user == null)
     return { redirect: { permanent: false, destination: '/users/sign-in' } }
 
