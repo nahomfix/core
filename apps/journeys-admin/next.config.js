@@ -56,6 +56,9 @@ const nextConfig = {
     // handled by github actions
     ignoreDuringBuilds: process.env.CI === 'true'
   },
-  transpilePackages: ['shared-ui']
+  transpilePackages: ['shared-ui'],
+  experimental: {
+    appDir: true
+  }
 }
 module.exports = composePlugins(withImages, withNx)(nextConfig)
