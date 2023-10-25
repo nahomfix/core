@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box'
+import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import { Theme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
@@ -40,26 +41,25 @@ export function TemplateViewHeader({
   }
 
   return (
-    <Stack>
-      {journey?.createdAt != null && (
-        <>
-          <Typography
-            data-testId="featuredAtTemplatePreviewPage"
-            variant="overline"
-            sx={{
-              color: 'secondary.light',
-              display: { xs: 'block', sm: 'none' },
-              pb: 6
-            }}
-            noWrap
-          >
-            {intlFormat(parseISO(journey?.createdAt), {
-              month: 'long',
-              year: 'numeric'
-            })}
-          </Typography>
-        </>
-      )}
+    <Stack data-testid="TemplateViewHeader">
+      <Typography
+        variant="overline"
+        sx={{
+          color: 'secondary.light',
+          display: { xs: 'block', sm: 'none' },
+          pb: 6
+        }}
+        noWrap
+      >
+        {journey?.createdAt != null ? (
+          intlFormat(parseISO(journey?.createdAt), {
+            month: 'long',
+            year: 'numeric'
+          })
+        ) : (
+          <Skeleton sx={{ width: '50%', maxWidth: 150 }} />
+        )}
+      </Typography>
       <Stack direction="row" sx={{ gap: { xs: 4, sm: 6 } }}>
         <Box
           sx={{
@@ -71,79 +71,69 @@ export function TemplateViewHeader({
         <Stack
           direction="column"
           sx={{
-            flexShrink: 1,
-            height: { xs: 107, sm: 244 }
+            width: '100%',
+            flexShrink: 1
           }}
         >
-          {journey?.createdAt != null && (
-            <Stack
-              direction="row"
-              alignItems="center"
+          <Stack
+            direction="row"
+            sx={{ height: 16, display: { xs: 'none', sm: 'flex' } }}
+          >
+            <Typography
+              variant="overline"
               sx={{
                 mt: collectionTags != null ? -2 : 0,
                 display: { xs: 'none', sm: 'flex' }
               }}
+              noWrap
             >
-              <Typography
-                variant="overline"
-                sx={{
-                  color: 'secondary.light',
-                  pr: '5px'
-                }}
-                data-testId="featuredAtTemplatePreviewPage"
-                noWrap
-              >
-                {intlFormat(parseISO(journey?.createdAt), {
+              {journey?.createdAt != null ? (
+                intlFormat(parseISO(journey?.createdAt), {
                   month: 'long',
                   year: 'numeric'
-                })}
-              </Typography>
-              {collectionTags != null && collectionTags.length > 0 && (
-                <>
-                  {collectionTags.map((tag) => (
-                    <TemplateCollectionsButton tag={tag} key={tag.id} />
-                  ))}
-                </>
+                })
+              ) : (
+                <Skeleton sx={{ width: '35%', maxWidth: 150 }} />
               )}
-            </Stack>
-          )}
-          <Stack>
+            </Typography>
             {collectionTags != null && collectionTags.length > 0 && (
-              <Stack
-                direction="row"
-                sx={{
-                  display: {
-                    xs: 'flex',
-                    sm: 'none',
-                    alignItems: 'center',
-                    flexWrap: 'wrap'
-                  }
-                }}
-              >
+              <>
                 {collectionTags.map((tag) => (
                   <TemplateCollectionsButton tag={tag} key={tag.id} />
                 ))}
-              </Stack>
+              </>
             )}
-            <Typography variant={smUp ? 'h1' : 'h6'} sx={{ pb: 4, mt: 'auto' }}>
-              {journey?.title}
-            </Typography>
           </Stack>
-          <Box
+          <Typography variant={smUp ? 'h1' : 'h6'} sx={{ pb: 4 }}>
+            {journey?.title != null ? (
+              journey?.title
+            ) : (
+              <Skeleton
+                data-testid="TemplateViewTitleSkeleton"
+                sx={{
+                  width: { xs: '100%', sm: '50%' },
+                  maxWidth: { xs: 200, sm: 400 }
+                }}
+              />
+            )}
+          </Typography>
+          <Typography
+            variant="body1"
             sx={{
-              maxHeight: '144px',
-              overflow: 'auto'
+              display: { xs: 'none', sm: 'block' }
             }}
           >
-            <Typography
-              variant="body1"
-              sx={{
-                display: { xs: 'none', sm: 'block' }
-              }}
-            >
-              {journey?.description}
-            </Typography>
-          </Box>
+            {journey?.description != null ? (
+              journey.description
+            ) : (
+              <>
+                {[0, 1].map((value) => (
+                  <Skeleton key={value} width="100%" />
+                ))}
+              </>
+            )}
+          </Typography>
+
           <Box
             sx={{
               display: { xs: 'none', sm: 'flex' },
