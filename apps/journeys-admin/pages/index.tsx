@@ -7,6 +7,7 @@ import { useRouter } from 'next/router'
 //   withUser,
 //   withUserTokenSSR
 // } from 'next-firebase-auth-edge'
+import { getTokens } from 'next-firebase-auth-edge/lib/next/tokens'
 import { NextSeo } from 'next-seo'
 import { ReactElement } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -26,7 +27,7 @@ import { TeamSelect } from '../src/components/Team/TeamSelect'
 import { initAndAuthApp } from '../src/libs/initAndAuthApp'
 import { User, useAuth } from '../src/libs/nextFirebaseAuthEdge/context'
 import { GetServerSideProps } from 'next'
-import { getAuth } from 'firebase/auth'
+import { getAuthUser } from '../src/libs/nextFirebaseAuthEdge/user'
 
 export const ACCEPT_ALL_INVITES = gql`
   mutation AcceptAllInvites {
@@ -96,9 +97,9 @@ export default function IndexPage({
 }
 
 export const getServerSideProps = async ({ locale, resolvedUrl }) => {
-  const user = getAuth().currentUser
-  if (user == null)
-    return { redirect: { permanent: false, destination: '/users/sign-in' } }
+  const user = await getAuthUser()
+  // if (user == null)
+  //   return { redirect: { permanent: false, destination: '/users/sign-in' } }
 
   const { apolloClient, flags, redirect, translations } = await initAndAuthApp({
     user,
