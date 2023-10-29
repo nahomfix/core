@@ -34,6 +34,7 @@ import { VideoControls } from './VideoControls'
 
 import 'videojs-youtube'
 import 'video.js/dist/video-js.css'
+import { iOS } from '../../libs/iOS'
 
 const VIDEO_BACKGROUND_COLOR = '#000'
 const VIDEO_FOREGROUND_COLOR = '#FFF'
@@ -160,7 +161,11 @@ export function Video({
           ) {
             player.muted(true)
           }
-          void player.play()
+          if (iOS()) {
+            setTimeout(async () => await player.play(), 500)
+          } else {
+            void player.play()
+          }
         }
       }
     }

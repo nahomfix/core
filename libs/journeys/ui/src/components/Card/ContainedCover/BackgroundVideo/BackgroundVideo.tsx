@@ -12,6 +12,7 @@ import {
   VideoBlockSource
 } from '../../../../../__generated__/globalTypes'
 import { TreeBlock } from '../../../../libs/block'
+import { iOS } from '../../../../libs/iOS'
 import { VideoFields } from '../../../Video/__generated__/VideoFields'
 
 import 'videojs-youtube'
@@ -71,7 +72,11 @@ export function BackgroundVideo({
       // Video jumps to new time and finishes loading
       player.on('ready', () => {
         player.currentTime(startAt ?? 0)
-        void player.play()
+        if (iOS() && source === VideoBlockSource.youTube) {
+          setTimeout(async () => await player.play(), 500)
+        } else {
+          void player.play()
+        }
       })
       player.on('seeked', () => {
         setLoading(false)
