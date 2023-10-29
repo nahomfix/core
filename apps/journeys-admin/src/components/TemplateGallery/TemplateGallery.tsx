@@ -17,7 +17,7 @@ export function TemplateGallery(): ReactElement {
   const { t } = useTranslation('apps-journeys-admin')
   const router = useRouter()
   const ENGLISH_LANGUAGE_ID = '529'
-  const [languageId, setLanguageId] = useState(ENGLISH_LANGUAGE_ID)
+  const [languageIds, setLanguageIds] = useState([ENGLISH_LANGUAGE_ID])
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>(
     router.query.tagIds != null ? castArray(router.query.tagIds) : []
   )
@@ -53,8 +53,8 @@ export function TemplateGallery(): ReactElement {
           {t('Journey Templates')}
         </Typography>
         <LanguageFilter
-          languageId={languageId}
-          onChange={(value) => setLanguageId(value)}
+          languageId={languageIds[0]}
+          onChange={(value) => setLanguageIds([value])}
         />
       </Stack>
       <Grid
@@ -91,7 +91,7 @@ export function TemplateGallery(): ReactElement {
       </Grid>
       <TemplateSections
         tagIds={selectedTagIds.length > 0 ? selectedTagIds : undefined}
-        languageId={languageId}
+        languageIds={languageIds}
       />
     </Container>
   )
