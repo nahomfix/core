@@ -1,9 +1,10 @@
+import Box from '@mui/material/Box'
 import { useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
-import Stack from '@mui/system/Stack'
-import { ReactElement, useRef } from 'react'
+import { ReactElement, useEffect, useRef, useState } from 'react'
 import SwiperCore, { A11y, Navigation, SwiperOptions } from 'swiper'
 import { Swiper, SwiperSlide } from 'swiper/react'
+import { NavigationOptions } from 'swiper/types/components/navigation'
 
 import { GetJourneys_journeys as Journeys } from '../../../../__generated__/GetJourneys'
 import { TemplateGalleryCard } from '../../TemplateGalleryCard'
@@ -25,8 +26,23 @@ export function TemplateSection({
   loading
 }: TemplateSectionProps): ReactElement {
   const { breakpoints } = useTheme()
+  const [swiper, setSwiper] = useState<SwiperCore>()
+
   const nextRef = useRef<HTMLButtonElement>(null)
   const prevRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (swiper != null) {
+      const navigation = swiper.params.navigation as NavigationOptions
+      navigation.nextEl = nextRef.current
+      navigation.prevEl = prevRef.current
+
+      swiper.navigation.destroy()
+      swiper.navigation.init()
+      swiper.navigation.update()
+    }
+  }, [swiper])
+
   const swiperBreakpoints: SwiperOptions['breakpoints'] = {
     [breakpoints.values.xs]: {
       slidesPerGroup: 2,
@@ -61,7 +77,7 @@ export function TemplateSection({
   }
 
   return (
-    <Stack spacing={4} justifyContent="center" sx={{ position: 'relative' }}>
+    <Box sx={{ position: 'relative' }}>
       <Typography variant="h5">{category}</Typography>
       {loading === true && (journeys === null || journeys?.length === 0) && (
         <Swiper breakpoints={swiperBreakpoints}>
@@ -91,17 +107,17 @@ export function TemplateSection({
           </SwiperSlide>
         </Swiper>
       )}
-      {journeys != null && (
+      {loading !== true && journeys != null && journeys?.length > 0 && (
         <Swiper
-          autoHeight
+          freeMode
           speed={850}
           watchOverflow
+          allowTouchMove
+          observer
+          observeParents
           breakpoints={swiperBreakpoints}
-          navigation={{
-            nextEl: nextRef.current,
-            prevEl: prevRef.current
-          }}
-          style={{ overflow: 'visible' }}
+          style={{ overflow: 'visible', marginTop: 16 }}
+          onSwiper={(swiper) => setSwiper(swiper)}
         >
           {journeys?.map((journey) => (
             <SwiperSlide
@@ -115,6 +131,6 @@ export function TemplateSection({
       )}
       <NavButton variant="prev" ref={prevRef} disabled={journeys == null} />
       <NavButton variant="next" ref={nextRef} disabled={journeys == null} />
-    </Stack>
+    </Box>
   )
 }
