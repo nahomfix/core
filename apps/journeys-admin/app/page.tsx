@@ -34,8 +34,8 @@ export const GET_ONBOARDING_JOURNEYS = gql`
 `
 
 export default async function IndexPage(): Promise<ReactElement> {
-  const { props } = await getServerSideProps()
-  return <ClientApp onboardingJourneys={props.onboardingJourneys} />
+  // const { props } = await getServerSideProps()
+  return <>Hi</> //</><ClientApp onboardingJourneys={props.onboardingJourneys} />
 }
 
 export const dynamic = 'force-dynamic'

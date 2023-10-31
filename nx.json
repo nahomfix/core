@@ -57,7 +57,8 @@
       "cache": true
     },
     "e2e": {
-      "cache": true
+      "cache": true,
+      "inputs": ["default", "^production"]
     }
   },
   "namedInputs": {

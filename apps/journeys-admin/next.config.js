@@ -59,6 +59,9 @@ const nextConfig = {
   transpilePackages: ['shared-ui'],
   experimental: {
     appDir: true
+  },
+  compiler: {
+    emotion: false
   }
 }
 module.exports = composePlugins(withImages, withNx)(nextConfig)
