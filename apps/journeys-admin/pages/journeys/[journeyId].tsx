@@ -1,13 +1,9 @@
-import { gql, useQuery } from '@apollo/client'
+import { gql } from '@apollo/client'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
-import {
-  AuthAction,
-  useUser,
-  withUser,
-  withUserTokenSSR
-} from 'next-firebase-auth'
+import { AuthAction, withUser, withUserTokenSSR } from 'next-firebase-auth'
 import { NextSeo } from 'next-seo'
-import { ReactElement } from 'react'
+import { ReactElement, Suspense } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { ActiveJourneyEditContent } from '@core/journeys/ui/EditorProvider'
@@ -19,65 +15,56 @@ import {
   GetAdminJourney,
   GetAdminJourney_journey as Journey
 } from '../../__generated__/GetAdminJourney'
-import { UserJourneyOpen } from '../../__generated__/UserJourneyOpen'
-import { Editor } from '../../src/components/Editor'
-import { EditToolbar } from '../../src/components/Editor/EditToolbar'
-import { JourneyEdit } from '../../src/components/Editor/JourneyEdit'
-import { PageWrapper } from '../../src/components/PageWrapper'
 import { initAndAuthApp } from '../../src/libs/initAndAuthApp'
-import { useInvalidJourneyRedirect } from '../../src/libs/useInvalidJourneyRedirect/useInvalidJourneyRedirect'
 
-export const GET_ADMIN_JOURNEY = gql`
+export const GET_ADMIN_JOURNEY_INFO = gql`
   ${JOURNEY_FIELDS}
-  query GetAdminJourney($id: ID!) {
+  query GetAdminJourneyInfo($id: ID!) {
     journey: adminJourney(id: $id, idType: databaseId) {
-      ...JourneyFields
-    }
-  }
-`
-
-export const USER_JOURNEY_OPEN = gql`
-  mutation UserJourneyOpen($id: ID!) {
-    userJourneyOpen(id: $id) {
       id
+      title
+      description
+      template
     }
   }
 `
 
-function JourneyEditPage(): ReactElement {
+interface JourneyEditPageProps {
+  journey: Journey
+}
+
+const DynamicJourneyEditPageContent = dynamic(
+  async () =>
+    await import(
+      /* webpackChunkName: "JourneyEditPageContent" */
+      '../../src/components/JourneyEditPageContent'
+    ),
+  {
+    ssr: false
+  }
+)
+
+function JourneyEditPage({ journey }: JourneyEditPageProps): ReactElement {
   const { t } = useTranslation('apps-journeys-admin')
   const router = useRouter()
-  const user = useUser()
-  const { data } = useQuery<GetAdminJourney>(GET_ADMIN_JOURNEY, {
-    variables: { id: router.query.journeyId }
-  })
-  useInvalidJourneyRedirect(data)
 
   return (
     <>
       <NextSeo
         title={
-          data?.journey?.title != null
-            ? t('Edit {{title}}', { title: data.journey.title })
+          journey.title != null
+            ? t('Edit {{title}}', { title: journey.title })
             : t('Edit Journey')
         }
-        description={data?.journey?.description ?? undefined}
+        description={journey.description ?? undefined}
       />
-      <Editor
-        journey={data?.journey ?? undefined}
-        selectedStepId={router.query.stepId as string | undefined}
-        view={router.query.view as ActiveJourneyEditContent | undefined}
-      >
-        <PageWrapper
-          title={data?.journey?.title ?? t('Edit Journey')}
-          showDrawer
-          backHref="/"
-          menu={<EditToolbar />}
-          user={user}
-        >
-          <JourneyEdit />
-        </PageWrapper>
-      </Editor>
+      <Suspense>
+        <DynamicJourneyEditPageContent
+          id={journey.id}
+          stepId={router.query.stepId as string | undefined}
+          view={router.query.view as ActiveJourneyEditContent | undefined}
+        />
+      </Suspense>
     </>
   )
 }
@@ -103,7 +90,7 @@ export const getServerSideProps = withUserTokenSSR({
   let journey: Journey | null
   try {
     const { data } = await apolloClient.query<GetAdminJourney>({
-      query: GET_ADMIN_JOURNEY,
+      query: GET_ADMIN_JOURNEY_INFO,
       variables: {
         id: query?.journeyId
       }
@@ -114,7 +101,7 @@ export const getServerSideProps = withUserTokenSSR({
     return {
       redirect: {
         permanent: false,
-        destination: `/journeys/${query?.journeyId as string}`
+        destination: `/`
       }
     }
   }
@@ -128,15 +115,11 @@ export const getServerSideProps = withUserTokenSSR({
     }
   }
 
-  await apolloClient.mutate<UserJourneyOpen>({
-    mutation: USER_JOURNEY_OPEN,
-    variables: { id: query?.journeyId }
-  })
-
   return {
     props: {
       flags,
-      ...translations
+      ...translations,
+      journey
     }
   }
 })
