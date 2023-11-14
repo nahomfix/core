@@ -69,6 +69,7 @@
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "extends": ["plugin:i18next/recommended"],
       "rules": {
         "@nx/enforce-module-boundaries": [
           "error",
