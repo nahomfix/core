@@ -9,10 +9,12 @@ import { JourneyFields_tags as Tags } from '../../../../../__generated__/Journey
 
 interface TemplateCollectionsButtonProps {
   tag: Tags
+  index: number
 }
 
 export function TemplateCollectionsButton({
-  tag
+  tag,
+  index
 }: TemplateCollectionsButtonProps): ReactElement {
   const router = useRouter()
   const { t } = useTranslation('apps-journeys-admin')
@@ -27,8 +29,8 @@ export function TemplateCollectionsButton({
           },
           flex: 'none',
           mt: { xs: -2, sm: 0 },
-          pl: { xs: '5px', sm: 0 },
-          pr: { xs: '3px', sm: 0 }
+          pr: index === 0 ? 2 : 3,
+          pl: 3
         }}
         noWrap
       >

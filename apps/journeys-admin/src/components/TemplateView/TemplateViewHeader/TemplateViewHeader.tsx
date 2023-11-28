@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { intlFormat, parseISO } from 'date-fns'
 import { User } from 'next-firebase-auth'
-import { ReactElement } from 'react'
+import { ReactElement, useEffect, useState } from 'react'
 
 import { useJourney } from '@core/journeys/ui/JourneyProvider'
 
@@ -29,18 +29,18 @@ export function TemplateViewHeader({
   authUser
 }: TemplateViewHeaderProps): ReactElement {
   const { journey } = useJourney()
+  const [collectionTags, setCollectionTags] = useState<Tag[] | undefined>()
   const hasCreatorDescription = journey?.creatorDescription != null
   const smUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('sm'))
 
-  let collectionTags: Tag[] | undefined
-  const collectionsId = journey?.tags.find(
-    (item) => item.name[0].value === 'Collections'
-  )?.id
-  if (collectionsId != null) {
-    collectionTags = journey?.tags.filter(
-      (tag) => tag.parentId === collectionsId
+  useEffect(() => {
+    setCollectionTags(
+      journey?.tags.filter(
+        (tag) =>
+          tag.name[0].value === 'Jesus Film' || tag.name[0].value === 'NUA'
+      )
     )
-  }
+  }, [journey?.tags])
 
   return (
     <Stack data-testid="JourneysAdminTemplateViewHeader">
@@ -81,19 +81,22 @@ export function TemplateViewHeader({
         <Stack
           direction="column"
           sx={{
-            width: '100%',
-            flexShrink: 1
+            width: '100%'
           }}
         >
           <Stack
             direction="row"
-            sx={{ height: 16, display: { xs: 'none', sm: 'flex' } }}
+            alignItems="center"
+            sx={{
+              height: 16,
+              display: { xs: 'none', sm: 'flex' }
+            }}
           >
             <Typography
               variant="overline"
               sx={{
-                mt: collectionTags != null ? -2 : 0,
-                display: { xs: 'none', sm: 'flex' }
+                display: { xs: 'none', sm: 'flex' },
+                color: 'secondary.light'
               }}
               noWrap
             >
@@ -108,8 +111,8 @@ export function TemplateViewHeader({
             </Typography>
             {collectionTags != null && collectionTags.length > 0 && (
               <>
-                {collectionTags.map((tag) => (
-                  <TemplateCollectionsButton tag={tag} key={tag.id} />
+                {collectionTags.map((tag, i) => (
+                  <TemplateCollectionsButton tag={tag} key={tag.id} index={i} />
                 ))}
               </>
             )}
