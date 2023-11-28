@@ -1,10 +1,8 @@
 import InsertPhotoRoundedIcon from '@mui/icons-material/InsertPhotoRounded'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
-import CardActionArea from '@mui/material/CardActionArea'
-import CardContent from '@mui/material/CardContent'
-import CardMedia from '@mui/material/CardMedia'
 import Skeleton from '@mui/material/Skeleton'
+import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { intlFormat, isThisYear, parseISO } from 'date-fns'
 import Image from 'next/image'
@@ -15,11 +13,36 @@ import { GetJourneys_journeys as Journey } from '../../../__generated__/GetJourn
 import { abbreviateLanguageName } from '../../libs/abbreviateLanguageName'
 
 export interface TemplateGalleryCardProps {
-  journey?: Journey
+  item?: Journey
+}
+
+interface HoverLayerProps {
+  className?: string
+}
+
+export function HoverLayer({ className }: HoverLayerProps): ReactElement {
+  return (
+    <Box
+      data-testid="hoverLayer"
+      className={className}
+      sx={{
+        transition: (theme) => theme.transitions.create('opacity'),
+        content: '""',
+        opacity: 0,
+        backgroundColor: 'secondary.dark',
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        zIndex: 2
+      }}
+    />
+  )
 }
 
 export function TemplateGalleryCard({
-  journey
+  item: journey
 }: TemplateGalleryCardProps): ReactElement {
   const localLanguage = journey?.language?.name.find(
     ({ primary }) => !primary
@@ -41,64 +64,92 @@ export function TemplateGalleryCard({
 
   return (
     <Card
-      aria-label="template-gallery-card"
+      aria-label="templateGalleryCard"
       variant="outlined"
       sx={{
         border: 'none',
         backgroundColor: 'transparent',
-        cursor: 'pointer'
+        cursor: 'pointer',
+        width: { xs: 130, md: 180, xl: 240 },
+        borderRadius: 2,
+        p: 2,
+        '& .MuiImageBackground-root': {
+          transition: (theme) => theme.transitions.create('transform')
+        },
+        '&:hover': {
+          transition: (theme) => theme.transitions.create('background-color'),
+          backgroundColor: (theme) => theme.palette.grey[200],
+          '& .MuiImageBackground-root': {
+            transform: 'scale(1.05)'
+          },
+          '& .hoverImageEffects': {
+            opacity: 0.3
+          }
+        }
       }}
     >
       <NextLink
         href={journey != null ? `/templates/${journey.id}` : ''}
         passHref
         legacyBehavior
+        prefetch={false}
       >
-        <CardActionArea sx={{ height: 'inherit' }}>
+        <Box
+          data-testid="templateGalleryCard"
+          sx={{
+            height: 'inherit'
+          }}
+        >
           {journey != null ? (
-            journey?.primaryImageBlock?.src != null ? (
-              <Box
-                sx={{
-                  position: 'relative',
-                  aspectRatio: 1
-                }}
-              >
-                <Image
-                  src={journey?.primaryImageBlock?.src}
-                  alt={journey?.primaryImageBlock.alt}
-                  fill
-                  style={{ borderRadius: 8, objectFit: 'cover' }}
-                />
-              </Box>
-            ) : (
-              <CardMedia
-                component="div"
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderColor: 'divider',
-                  aspectRatio: 1,
-                  borderRadius: 2,
-                  backgroundColor: 'background.default'
-                }}
-              >
-                <InsertPhotoRoundedIcon />
-              </CardMedia>
-            )
+            <Stack
+              justifyContent="center"
+              alignItems="center"
+              sx={{
+                position: 'relative',
+                aspectRatio: 1,
+                overflow: 'hidden',
+                borderRadius: 2,
+                alignItems: 'center',
+                backgroundColor: 'background.default'
+              }}
+            >
+              {journey?.primaryImageBlock?.src != null ? (
+                <>
+                  <HoverLayer className="hoverImageEffects" />
+                  <Image
+                    className="MuiImageBackground-root"
+                    src={journey?.primaryImageBlock?.src}
+                    alt={journey?.primaryImageBlock.alt}
+                    fill
+                    style={{
+                      objectFit: 'cover'
+                    }}
+                  />
+                </>
+              ) : (
+                <>
+                  <HoverLayer className="hoverImageEffects" />
+                  <InsertPhotoRoundedIcon className="MuiImageBackground-root" />
+                </>
+              )}
+            </Stack>
           ) : (
             <Skeleton
               variant="rectangular"
               sx={{
-                height: { xs: 130, lg: 180 },
+                width: { xs: 130, md: 180, xl: 240 },
+                height: { xs: 130, md: 180, xl: 240 },
                 borderColor: 'divider',
                 borderRadius: 2,
                 backgroundColor: 'background.default'
               }}
             />
           )}
-          <CardContent
-            sx={{ display: 'flex', flexDirection: 'column', px: 0, py: 3 }}
+          <Stack
+            sx={{
+              px: 0,
+              py: 3
+            }}
           >
             {journey != null ? (
               <>
@@ -113,27 +164,44 @@ export function TemplateGalleryCard({
                 >
                   {date} ● {displayLanguage}
                 </Typography>
-                <Typography
-                  variant="subtitle2"
+                <Box
                   sx={{
-                    my: 1,
-                    display: { xs: 'none', lg: 'block' }
-                  }}
-                >
-                  {journey.title}
-                </Typography>
-                <Typography
-                  variant="subtitle3"
-                  sx={{
-                    whiteSpace: 'noWrap',
+                    display: { xs: 'none', md: '-webkit-box' },
+                    height: '66px',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    my: 1,
-                    display: { xs: 'block', lg: 'none' }
+                    WebkitBoxOrient: 'vertical',
+                    WebkitLineClamp: 3
                   }}
                 >
-                  {journey.title}
-                </Typography>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      my: 1
+                    }}
+                  >
+                    {journey.title}
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    display: { xs: '-webkit-box', md: 'none' },
+                    height: '63px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    WebkitBoxOrient: 'vertical',
+                    WebkitLineClamp: 3
+                  }}
+                >
+                  <Typography
+                    variant="subtitle3"
+                    sx={{
+                      my: 1
+                    }}
+                  >
+                    {journey.title}
+                  </Typography>
+                </Box>
               </>
             ) : (
               <Box>
@@ -142,8 +210,8 @@ export function TemplateGalleryCard({
                 <Skeleton variant="text" sx={{ width: '60%' }} />
               </Box>
             )}
-          </CardContent>
-        </CardActionArea>
+          </Stack>
+        </Box>
       </NextLink>
     </Card>
   )

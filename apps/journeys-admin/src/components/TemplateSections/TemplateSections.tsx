@@ -1,15 +1,17 @@
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
+import { useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import map from 'lodash/map'
 import take from 'lodash/take'
 import { ReactElement, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { SwiperOptions } from 'swiper'
 
 import { GetJourneys_journeys as Journey } from '../../../__generated__/GetJourneys'
 import { useJourneysQuery } from '../../libs/useJourneysQuery'
-
-import { TemplateSection } from './TemplateSection'
+import { TemplateGalleryCarousel } from '../TemplateGallery/TemplateGalleryCarousel'
+import { TemplateGalleryCard } from '../TemplateGalleryCard'
 
 interface Contents {
   [key: string]: { category: string; journeys: Journey[] }
@@ -17,38 +19,43 @@ interface Contents {
 
 interface TemplateSectionsProps {
   tagIds?: string[]
-  languageId: string
+  languageIds?: string[]
 }
 
 export function TemplateSections({
   tagIds,
-  languageId
+  languageIds
 }: TemplateSectionsProps): ReactElement {
   const { t } = useTranslation('apps-journeys-admin')
+  const { breakpoints } = useTheme()
   const [contents, setContents] = useState<Contents>({})
   const [collection, setCollection] = useState<Journey[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const { data, loading } = useJourneysQuery({
+  useJourneysQuery({
     variables: {
       where: {
         template: true,
         orderByRecent: true,
         tagIds,
-        languageIds: [languageId]
+        languageIds:
+          languageIds != null && languageIds?.length > 0
+            ? languageIds
+            : undefined
       }
     },
     onCompleted(data) {
-      const collection =
-        tagIds == null
-          ? [
-              ...data.journeys.filter(({ featuredAt }) => featuredAt != null),
-              ...take(
-                data.journeys.filter(({ featuredAt }) => featuredAt == null),
-                10
-              )
-            ]
-          : data.journeys
-      setCollection(collection)
+      const featuredAndNew = [
+        ...data.journeys.filter(({ featuredAt }) => featuredAt != null),
+        ...take(
+          data.journeys.filter(({ featuredAt }) => featuredAt == null),
+          10
+        )
+      ]
+      const mostRelevant = data.journeys.filter(({ tags }) =>
+        tagIds?.every((tagId) => tags.find((tag) => tag.id === tagId))
+      )
+      setCollection(tagIds == null ? featuredAndNew : mostRelevant)
       const contents = {}
       data.journeys.forEach((journey) => {
         journey.tags.forEach((tag) => {
@@ -61,27 +68,54 @@ export function TemplateSections({
         })
       })
       setContents(contents)
+      setLoading(false)
     }
   })
 
+  const swiperBreakpoints: SwiperOptions['breakpoints'] = {
+    [breakpoints.values.xs]: {
+      slidesPerGroup: 2,
+      spaceBetween: 4
+    },
+    [breakpoints.values.sm]: {
+      slidesPerGroup: 3,
+      spaceBetween: 4
+    },
+    [breakpoints.values.md]: {
+      slidesPerGroup: 4,
+      spaceBetween: 32
+    },
+    [breakpoints.values.lg]: {
+      slidesPerGroup: 5,
+      spaceBetween: 32
+    },
+    [breakpoints.values.xl]: {
+      slidesPerGroup: 6,
+      spaceBetween: 44
+    },
+    [breakpoints.values.xxl]: {
+      slidesPerGroup: 7,
+      spaceBetween: 44
+    }
+  }
+
   return (
-    <Stack spacing={8}>
-      {(loading || (data?.journeys != null && data.journeys.length > 0)) && (
-        <TemplateSection
-          category={tagIds == null ? t('Featured & New') : t('Most Relevant')}
-          journeys={collection}
+    <Stack spacing={8} data-testid="JourneysAdminTemplateSections">
+      {(loading || (collection != null && collection.length > 0)) && (
+        <TemplateGalleryCarousel
+          heading={tagIds == null ? t('Featured & New') : t('Most Relevant')}
+          items={collection}
+          renderItem={(itemProps) => <TemplateGalleryCard {...itemProps} />}
+          breakpoints={swiperBreakpoints}
           loading={loading}
+          loadingSpacing={{
+            xs: 1,
+            md: 8,
+            xl: 11
+          }}
         />
       )}
-      {map(
-        contents,
-        ({ category, journeys }, key) =>
-          ((tagIds == null && journeys.length >= 5) ||
-            tagIds?.includes(key) === true) && (
-            <TemplateSection category={category} journeys={journeys} />
-          )
-      )}
-      {!loading && data?.journeys != null && data.journeys.length === 0 && (
+      {!loading && collection != null && collection.length === 0 && (
         <Paper
           elevation={0}
           variant="outlined"
@@ -100,6 +134,24 @@ export function TemplateSections({
             )}
           </Typography>
         </Paper>
+      )}
+      {map(
+        contents,
+        ({ category, journeys }, key) =>
+          ((tagIds == null && journeys.length >= 5) ||
+            tagIds?.includes(key) === true) && (
+            <TemplateGalleryCarousel
+              heading={category}
+              items={journeys}
+              renderItem={(itemProps) => <TemplateGalleryCard {...itemProps} />}
+              breakpoints={swiperBreakpoints}
+              loadingSpacing={{
+                xs: 1,
+                md: 8,
+                xl: 11
+              }}
+            />
+          )
       )}
     </Stack>
   )

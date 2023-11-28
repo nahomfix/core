@@ -18,6 +18,15 @@ jest.mock('@mui/material/useMediaQuery', () => ({
   default: () => true
 }))
 
+jest.mock('react-i18next', () => ({
+  __esModule: true,
+  useTranslation: () => {
+    return {
+      t: (str: string) => str
+    }
+  }
+}))
+
 describe('TemplateViewHeader', () => {
   it('should render the social image', () => {
     const primaryImageBlock: PrimaryImageBlock = {
@@ -53,6 +62,91 @@ describe('TemplateViewHeader', () => {
     expect(getByRole('img', { name: 'image.jpg' })).toBeInTheDocument()
   })
 
+  it('should show creator details if provided', async () => {
+    const journeyWithCreatorDetails = {
+      ...journey,
+      strategySlug: null,
+      tags: [],
+      creatorDescription:
+        'Created by a Name of a Mission or Missionaries Organisation label by a Name of a Mission or Missionaries',
+      creatorImageBlock: {
+        id: 'creatorImageBlock.id',
+        parentBlockId: null,
+        parentOrder: 3,
+        src: 'https://images.unsplash.com/photo-1508363778367-af363f107cbb?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&dl=chester-wade-hLP7lVm4KUE-unsplash.jpg&w=1920',
+        alt: 'photo-1552410260-0fd9b577afa6',
+        width: 6000,
+        height: 4000,
+        blurhash: 'LHFr#AxW9a%L0KM{IVRkoMD%D%R*',
+        __typename: 'ImageBlock'
+      }
+    }
+    const { getByText, getByRole } = render(
+      <MockedProvider>
+        <JourneyProvider
+          value={{
+            journey: journeyWithCreatorDetails as Journey,
+            variant: 'admin'
+          }}
+        >
+          <TemplateViewHeader isPublisher authUser={{} as unknown as User} />
+        </JourneyProvider>
+      </MockedProvider>
+    )
+
+    expect(
+      getByText(
+        'Created by a Name of a Mission or Missionaries Organisation label by a Name of a Mission or Missionaries'
+      )
+    ).toBeInTheDocument()
+    const creatorImage = getByRole('img')
+    expect(creatorImage).toBeInTheDocument()
+    expect(creatorImage).toHaveAttribute(
+      'src',
+      'https://images.unsplash.com/photo-1508363778367-af363f107cbb?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&dl=chester-wade-hLP7lVm4KUE-unsplash.jpg&w=1920'
+    )
+  })
+
+  it('should not show creator details if description is not provided', async () => {
+    const journeyWithCreatorDetails = {
+      ...journey,
+      strategySlug: null,
+      tags: [],
+      creatorDescription: null,
+      creatorImageBlock: {
+        id: 'creatorImageBlock.id',
+        parentBlockId: null,
+        parentOrder: 3,
+        src: 'https://images.unsplash.com/photo-1508363778367-af363f107cbb?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&dl=chester-wade-hLP7lVm4KUE-unsplash.jpg&w=1920',
+        alt: 'photo-1552410260-0fd9b577afa6',
+        width: 6000,
+        height: 4000,
+        blurhash: 'LHFr#AxW9a%L0KM{IVRkoMD%D%R*',
+        __typename: 'ImageBlock'
+      }
+    }
+    const { queryByText, queryByRole } = render(
+      <MockedProvider>
+        <JourneyProvider
+          value={{
+            journey: journeyWithCreatorDetails as Journey,
+            variant: 'admin'
+          }}
+        >
+          <TemplateViewHeader isPublisher authUser={{} as unknown as User} />
+        </JourneyProvider>
+      </MockedProvider>
+    )
+
+    expect(
+      queryByText(
+        'Created by a Name of a Mission or Missionaries Organisation label by a Name of a Mission or Missionaries'
+      )
+    ).not.toBeInTheDocument()
+    const creatorImage = queryByRole('img')
+    expect(creatorImage).not.toBeInTheDocument()
+  })
+
   it('should display the title and description', () => {
     const { getByText } = render(
       <MockedProvider>
@@ -72,7 +166,7 @@ describe('TemplateViewHeader', () => {
     expect(getByText('my cool journey')).toBeInTheDocument()
   })
 
-  it('should render Use Template button', async () => {
+  it('should render Use This Template button', async () => {
     const { getAllByText } = render(
       <MockedProvider>
         <SnackbarProvider>
@@ -91,12 +185,12 @@ describe('TemplateViewHeader', () => {
     )
 
     await waitFor(() =>
-      expect(getAllByText('Use Template')[0]).toBeInTheDocument()
+      expect(getAllByText('Use This Template')[0]).toBeInTheDocument()
     )
   })
 
   it('should render Template Edit button for publishers', () => {
-    const { getAllByTestId } = render(
+    const { getAllByRole } = render(
       <MockedProvider>
         <SnackbarProvider>
           <JourneyProvider
@@ -113,7 +207,31 @@ describe('TemplateViewHeader', () => {
       </MockedProvider>
     )
 
-    expect(getAllByTestId('EditTemplateSettings')[0]).toBeInTheDocument()
+    expect(getAllByRole('link', { name: 'Edit' })).toHaveLength(2)
+  })
+
+  it('edit button should redirect to publisher journey edit', () => {
+    const { getAllByRole } = render(
+      <MockedProvider>
+        <SnackbarProvider>
+          <JourneyProvider
+            value={{
+              journey
+            }}
+          >
+            <TemplateViewHeader
+              isPublisher
+              authUser={{ id: '123' } as unknown as User}
+            />
+          </JourneyProvider>
+        </SnackbarProvider>
+      </MockedProvider>
+    )
+
+    expect(getAllByRole('link', { name: 'Edit' })[0]).toHaveAttribute(
+      'href',
+      '/publisher/journeyId'
+    )
   })
 
   it('should not render Template Edit button for non-publishers', () => {
@@ -134,7 +252,7 @@ describe('TemplateViewHeader', () => {
       </MockedProvider>
     )
 
-    expect(queryByTestId('EditTemplateSettings')).not.toBeInTheDocument()
+    expect(queryByTestId('TemplateEditButton')).not.toBeInTheDocument()
   })
 
   it('should render preview button', () => {
