@@ -1,7 +1,8 @@
 {
+  "404": "404",
+  "500": "500",
   "%s | Next Steps": "%s | Next Steps",
-  "Next Steps | Helping you find the next best step on your spiritual journey": "Next Steps | Helping you find the next best step on your spiritual journey",
-  "NextSteps © {{year}}": "NextSteps © {{year}}",
-  "Terms": "Terms",
-  "Privacy": "Privacy"
+  "Next Steps": "Next Steps",
+  "This Journey is not available.": "This Journey is not available.",
+  "Oops! Something went wrong.": "Oops! Something went wrong."
 }
