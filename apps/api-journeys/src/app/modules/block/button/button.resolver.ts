@@ -32,6 +32,7 @@ export class ButtonBlockResolver {
     const parentOrder = (
       await this.blockService.getSiblings(input.journeyId, input.parentBlockId)
     ).length
+
     return await this.prismaService.$transaction(async (tx) => {
       const block = await tx.block.create({
         data: {
@@ -52,6 +53,7 @@ export class ButtonBlockResolver {
           }
         }
       })
+
       if (!ability.can(Action.Update, subject('Journey', block.journey)))
         throw new GraphQLError('user is not allowed to create block', {
           extensions: { code: 'FORBIDDEN' }
